@@ -25,7 +25,7 @@ public class CachKetNoiVoiDatabase {
 						
 			// Bước 4: Xử lý kết quả:
 			System.out.println("Số dòng thay đổi: "+check);
-			if(check>0) {
+			if(check>0) {	
 				System.out.println("Thêm dữ liệu thành công!");
 			}else {
 				System.out.println("Thêm dữ liệu thất bại!");
