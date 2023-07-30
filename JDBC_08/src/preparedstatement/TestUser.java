@@ -13,10 +13,10 @@ public class TestUser {
 		User u_result = UserDAO.getInstance().selectById(u_find);
 		System.out.println(u_result);
 		
-//		System.out.println("---------------------------------");
-//		User u_find = new User("x\' or 1=1; -- ", "", "");
-//		User u_result = UserDAO.getInstance().selectById(u_find);
-//		System.out.println(u_result);
+		System.out.println("---------------------------------");
+		User u_find1 = new User("x\' or 1=1; -- ", "", "");
+		User u_result1 = UserDAO.getInstance().selectById(u_find1);
+		System.out.println(u_result1);
 		
 	}
 }

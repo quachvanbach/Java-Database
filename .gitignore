@@ -5,3 +5,5 @@
 **/.project
 *.metadata/
 MysqlQuerry/
+MavenProject/
+JDBC_08/
