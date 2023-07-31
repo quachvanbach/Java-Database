@@ -7,3 +7,4 @@
 MysqlQuerry/
 MavenProject/
 JDBC_08/
+**/src/test/
