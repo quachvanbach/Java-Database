@@ -11,3 +11,4 @@ JDBC_08/
 **/.gitignore.txt
 **/target/
 **/pom.xml
+**/.gitignore
