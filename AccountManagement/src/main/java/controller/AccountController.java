@@ -21,6 +21,9 @@ public class AccountController implements ActionListener {
 			view.addAccount();
 		} else if (acctionCommand.equals("Edit")) {
 			view.editAccount();
+		} else if (acctionCommand.equals("Save")) {
+			view.saveAccount();
+			System.out.println(acctionCommand);
 		} else if (acctionCommand.equals("Delete")) {
 			view.deleteAccount();
 		}

@@ -2,6 +2,7 @@ package viewer;
 
 import java.awt.EventQueue;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -22,6 +23,7 @@ import java.awt.Window;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.awt.Button;
+import java.awt.Component;
 
 public class AccountView extends JFrame {
 
@@ -44,6 +46,9 @@ public class AccountView extends JFrame {
 	private Account account;
 	private AccountDAO accountDao = new AccountDAO();
 	private AccountModel accountModel = new AccountModel();
+	private Button button_add;
+	private Button button_edit;
+	private Button button_delete;
 
 	public AccountView() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -123,17 +128,17 @@ public class AccountView extends JFrame {
 		textField_passMail.setBounds(108, 206, 225, 22);
 		contentPane.add(textField_passMail);
 
-		Button button_add = new Button("Add");
+		button_add = new Button("Add");
 		button_add.addActionListener(action);
 		button_add.setBounds(10, 246, 70, 22);
 		contentPane.add(button_add);
 
-		Button button_edit = new Button("Edit");
+		button_edit = new Button("Edit");
 		button_edit.addActionListener(action);
 		button_edit.setBounds(139, 246, 70, 22);
 		contentPane.add(button_edit);
 
-		Button button_delete = new Button("Delete");
+		button_delete = new Button("Delete");
 		button_delete.addActionListener(action);
 		button_delete.setBounds(263, 246, 70, 22);
 		contentPane.add(button_delete);
@@ -163,20 +168,55 @@ public class AccountView extends JFrame {
 			accountDao.insert(accountInfo());
 			refreshTable();
 		} catch (Throwable ex) {
-			System.out.println(ex.getMessage());
-			JOptionPane.showMessageDialog(null, "Lỗi thêm tài khoản:\n" + ex.getMessage(), "Lỗi",
+			JOptionPane.showMessageDialog(this, "Lỗi thêm tài khoản:\n" + ex.getMessage(), "Lỗi",
 					JOptionPane.ERROR_MESSAGE);
 		}
 
 	}
 
-	public void editAccount() {
-		System.out.println("Ban da click nut Edit");
+	private Account getSelectedAccount() {
+		account = new Account();
+		int selectedRow = table.getSelectedRow();
+		account.setId(Integer.valueOf(accountModel.getValueAt(selectedRow, 0) + ""));
+		account.setAccountType(accountModel.getValueAt(selectedRow, 1) + "");
+		account.setUsername(accountModel.getValueAt(selectedRow, 2) + "");
+		account.setPassword(accountModel.getValueAt(selectedRow, 3) + "");
+		account.setTwoFA(accountModel.getValueAt(selectedRow, 4) + "");
+		account.setPhonenumber(accountModel.getValueAt(selectedRow, 5) + "");
+		account.setEmail(accountModel.getValueAt(selectedRow, 6) + "");
+		account.setPassMail(accountModel.getValueAt(selectedRow, 7) + "");
 
+		return account;
+	}
+
+	public void editAccount() {
+		textField_accountType.setText(getSelectedAccount().getAccountType() + "");
+		textField_username.setText(getSelectedAccount().getUsername());
+		textField_password.setText(getSelectedAccount().getPassword());
+		textField_twoFA.setText(getSelectedAccount().getTwoFA());
+		textField_phonenumber.setText(getSelectedAccount().getPhonenumber());
+		textField_email.setText(getSelectedAccount().getEmail());
+		textField_passMail.setText(getSelectedAccount().getPassMail());
+
+		button_edit.setLabel("Save");
+	}
+
+	public void saveAccount() {
+		try {
+			int id = getSelectedAccount().getId();
+			account = accountInfo();
+			account.setId(id);
+			accountDao.update(account);
+			button_edit.setLabel("Edit");
+			refreshTable();
+		} catch (Throwable ex) {
+			JOptionPane.showMessageDialog(this, "Lỗi sửa tài khoản: \n" + ex);
+		}
 	}
 
 	public void deleteAccount() {
-		System.out.println("Ban da click nut Delete");
-
+		account = getSelectedAccount();
+		accountDao.delete(account);
+		refreshTable();
 	}
 }

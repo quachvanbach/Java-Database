@@ -12,3 +12,6 @@ JDBC_08/
 **/target/
 **/pom.xml
 **/.gitignore
+PasswordManager/
+PasswordManager1/
+ManagementPassword/
