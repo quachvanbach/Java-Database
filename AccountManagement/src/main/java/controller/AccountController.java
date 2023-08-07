@@ -26,6 +26,10 @@ public class AccountController implements ActionListener {
 			System.out.println(acctionCommand);
 		} else if (acctionCommand.equals("Delete")) {
 			view.deleteAccount();
+		}else if (acctionCommand.equals("Search")) {
+			view.searchAccount();
+		}else if (acctionCommand.equals("Cancel")) {
+			view.cancelSearch();
 		}
 
 	}

@@ -120,6 +120,13 @@ public class Account {
 	public void setPassMail(String passMail) {
 		this.passMail = passMail;
 	}
+
+	@Override
+	public String toString() {
+		return "Account [id=" + id + ", accountType=" + accountType + ", username=" + username + ", password="
+				+ password + ", twoFA=" + twoFA + ", phonenumber=" + phonenumber + ", email=" + email + ", passMail="
+				+ passMail + "]";
+	}
 	
 	
 }

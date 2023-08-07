@@ -8,8 +8,8 @@ import javax.swing.table.AbstractTableModel;
 
 public class AccountModel extends AbstractTableModel {
 	private List<Account> data;
-	private final String[] columnNames = { "ID", "Account Type", "Username", "Password", "2FA", "Phonenumber", "Email",
-			"Pass Mail" };
+	private final String[] columnNames  = new String[] { "ID", "Account Type", "Username", "Password", "2FA", "Phonenumber", "Email",
+	"Pass Mail" };;
 
 	public AccountModel() {
 		data = new ArrayList<Account>();

@@ -6,6 +6,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.border.EmptyBorder;
 
 import controller.AccountController;
@@ -24,6 +25,7 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import java.awt.Button;
 import java.awt.Component;
+import javax.swing.JSeparator;
 
 public class AccountView extends JFrame {
 
@@ -38,17 +40,23 @@ public class AccountView extends JFrame {
 	private Label label_passMail;
 	private TextField textField_accountType;
 	private TextField textField_username;
-	private TextField textField_password;
+	private JPasswordField passwordField_password;
 	private TextField textField_twoFA;
 	private TextField textField_phonenumber;
 	private TextField textField_email;
-	private TextField textField_passMail;
+	private JPasswordField passwordField_passMail;
 	private Account account;
 	private AccountDAO accountDao = new AccountDAO();
 	private AccountModel accountModel = new AccountModel();
 	private Button button_add;
 	private Button button_edit;
 	private Button button_delete;
+	private TextField textField_search_accountType;
+	private Label label_search_accountType;
+	private TextField textField_search_username;
+	private Label label_search_username;
+	private Button button_search;
+	private Button button_cancel;
 
 	public AccountView() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -63,8 +71,8 @@ public class AccountView extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		table = new JTable();
-		table.setModel(accountModel);
+		table = new JTable(accountModel);
+//		table.setModel(accountModel);
 		table.setBounds(167, 156, 1, 1);
 
 		ScrollPane scrollPane = new ScrollPane();
@@ -108,9 +116,9 @@ public class AccountView extends JFrame {
 		textField_username.setBounds(108, 66, 225, 22);
 		contentPane.add(textField_username);
 
-		textField_password = new TextField();
-		textField_password.setBounds(108, 94, 225, 22);
-		contentPane.add(textField_password);
+		passwordField_password = new JPasswordField();
+		passwordField_password.setBounds(108, 94, 225, 22);
+		contentPane.add(passwordField_password);
 
 		textField_twoFA = new TextField();
 		textField_twoFA.setBounds(108, 122, 225, 22);
@@ -124,9 +132,9 @@ public class AccountView extends JFrame {
 		textField_email.setBounds(108, 178, 225, 22);
 		contentPane.add(textField_email);
 
-		textField_passMail = new TextField();
-		textField_passMail.setBounds(108, 206, 225, 22);
-		contentPane.add(textField_passMail);
+		passwordField_passMail = new JPasswordField();
+		passwordField_passMail.setBounds(108, 206, 225, 22);
+		contentPane.add(passwordField_passMail);
 
 		button_add = new Button("Add");
 		button_add.addActionListener(action);
@@ -143,22 +151,53 @@ public class AccountView extends JFrame {
 		button_delete.setBounds(263, 246, 70, 22);
 		contentPane.add(button_delete);
 
+		JSeparator separator = new JSeparator();
+		separator.setBounds(10, 286, 323, 2);
+		contentPane.add(separator);
+
+		label_search_accountType = new Label("Account Type");
+		label_search_accountType.setBounds(10, 309, 92, 22);
+		contentPane.add(label_search_accountType);
+
+		label_search_username = new Label("Username");
+		label_search_username.setBounds(10, 337, 92, 22);
+		contentPane.add(label_search_username);
+
+		textField_search_accountType = new TextField();
+		textField_search_accountType.setBounds(108, 309, 225, 22);
+		contentPane.add(textField_search_accountType);
+
+		textField_search_username = new TextField();
+		textField_search_username.setBounds(108, 337, 225, 22);
+		contentPane.add(textField_search_username);
+
+		button_search = new Button("Search");
+		button_search.addActionListener(action);
+		button_search.setBounds(108, 365, 84, 22);
+		contentPane.add(button_search);
+		
+		button_cancel = new Button("Cancel");
+		button_cancel.addActionListener(action);
+		button_cancel.setBounds(249, 365, 84, 22);
+		contentPane.add(button_cancel);
+
 	}
 
 	public void refreshTable() {
 		List<Account> acounts = accountDao.selectAll();
 		accountModel.setData(acounts);
 		accountModel.fireTableDataChanged();
+//		accountModel.fireTableStructureChanged();
 	}
 
 	private Account accountInfo() {
 		String accountType = textField_accountType.getText();
 		String username = textField_username.getText();
-		String password = textField_password.getText();
+		String password =new String(passwordField_password.getPassword());
 		String twoFA = textField_twoFA.getText();
 		String phonenumber = textField_phonenumber.getText();
 		String email = textField_email.getText();
-		String passMail = textField_passMail.getText();
+		String passMail = new String(passwordField_passMail.getPassword());
 		account = new Account(accountType, username, password, twoFA, phonenumber, email, passMail);
 		return account;
 	}
@@ -166,6 +205,7 @@ public class AccountView extends JFrame {
 	public void addAccount() {
 		try {
 			accountDao.insert(accountInfo());
+			button_edit.setLabel("Edit");
 			refreshTable();
 		} catch (Throwable ex) {
 			JOptionPane.showMessageDialog(this, "Lỗi thêm tài khoản:\n" + ex.getMessage(), "Lỗi",
@@ -192,16 +232,18 @@ public class AccountView extends JFrame {
 	public void editAccount() {
 		textField_accountType.setText(getSelectedAccount().getAccountType() + "");
 		textField_username.setText(getSelectedAccount().getUsername());
-		textField_password.setText(getSelectedAccount().getPassword());
+		passwordField_password.setText(getSelectedAccount().getPassword());
 		textField_twoFA.setText(getSelectedAccount().getTwoFA());
 		textField_phonenumber.setText(getSelectedAccount().getPhonenumber());
 		textField_email.setText(getSelectedAccount().getEmail());
-		textField_passMail.setText(getSelectedAccount().getPassMail());
+		passwordField_passMail.setText(getSelectedAccount().getPassMail());
 
 		button_edit.setLabel("Save");
 	}
 
 	public void saveAccount() {
+
+		
 		try {
 			int id = getSelectedAccount().getId();
 			account = accountInfo();
@@ -218,5 +260,25 @@ public class AccountView extends JFrame {
 		account = getSelectedAccount();
 		accountDao.delete(account);
 		refreshTable();
+	}
+
+	public void searchAccount() {
+		try {
+			account = new Account();
+			account.setAccountType(textField_search_accountType.getText());
+			account.setUsername(textField_search_username.getText());
+			List<Account> listAccount = accountDao.getAccount(account);
+			accountModel.setData(listAccount);
+			accountModel.fireTableDataChanged();
+			
+		} catch (Throwable ex) {
+			JOptionPane.showMessageDialog(this, "Lỗi tìm kiếm tài khoản: \n" + ex);
+		}
+		
+	}
+
+	public void cancelSearch() {
+		refreshTable();
+		System.out.println("Cancel Search");
 	}
 }
