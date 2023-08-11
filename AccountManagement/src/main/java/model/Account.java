@@ -33,7 +33,6 @@ public class Account {
 
 	public Account(String accountType, String username, String password, String twoFA, String phonenumber, String email,
 			String passMail) {
-		super();
 		this.accountType = accountType;
 		this.username = username;
 		this.password = password;
@@ -45,7 +44,6 @@ public class Account {
 
 	public Account(int id, String accountType, String username, String password, String twoFA, String phonenumber,
 			String email, String passMail) {
-		super();
 		this.id = id;
 		this.accountType = accountType;
 		this.username = username;

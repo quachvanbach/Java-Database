@@ -1,9 +1,14 @@
 package model;
 
+import java.awt.TextField;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.print.attribute.standard.Sides;
+import javax.swing.JPasswordField;
 import javax.swing.table.AbstractTableModel;
 
 public class AccountModel extends AbstractTableModel {
@@ -61,6 +66,30 @@ public class AccountModel extends AbstractTableModel {
 			return account.getPassMail();
 		default:
 			return null;
+		}
+	}
+
+	public void copyToClipboard(String text) {
+		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		StringSelection selection = new StringSelection(text);
+		clipboard.setContents(selection,null);
+	}
+	
+	public boolean checkEmptyTextField(TextField textField) {
+		if (textField.getText().isEmpty()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public boolean checkEmptyPasswordField(JPasswordField passwordField) {
+		char[] passwordChars = passwordField.getPassword();
+		String password = new String(passwordChars);
+		if (password.isEmpty()) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 }

@@ -57,10 +57,12 @@ public class AccountView extends JFrame {
 	private Label label_search_username;
 	private Button button_search;
 	private Button button_cancel;
+	private Button button_copyPassword;
+	private Button button_copyPassMail;
 
 	public AccountView() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 1031, 486);
+		setBounds(100, 100, 1147, 486);
 		setLocationRelativeTo(null);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -76,7 +78,7 @@ public class AccountView extends JFrame {
 		table.setBounds(167, 156, 1, 1);
 
 		ScrollPane scrollPane = new ScrollPane();
-		scrollPane.setBounds(366, 0, 639, 437);
+		scrollPane.setBounds(456, 0, 665, 437);
 		scrollPane.add(table);
 		contentPane.add(scrollPane);
 
@@ -120,6 +122,11 @@ public class AccountView extends JFrame {
 		passwordField_password.setBounds(108, 94, 225, 22);
 		contentPane.add(passwordField_password);
 
+		button_copyPassword = new Button("Copy Password");
+		button_copyPassword.addActionListener(action);
+		button_copyPassword.setBounds(339, 94, 100, 22);
+		contentPane.add(button_copyPassword);
+
 		textField_twoFA = new TextField();
 		textField_twoFA.setBounds(108, 122, 225, 22);
 		contentPane.add(textField_twoFA);
@@ -135,6 +142,11 @@ public class AccountView extends JFrame {
 		passwordField_passMail = new JPasswordField();
 		passwordField_passMail.setBounds(108, 206, 225, 22);
 		contentPane.add(passwordField_passMail);
+
+		button_copyPassMail = new Button("Copy Pass Mail");
+		button_copyPassMail.addActionListener(action);
+		button_copyPassMail.setBounds(339, 206, 100, 22);
+		contentPane.add(button_copyPassMail);
 
 		button_add = new Button("Add");
 		button_add.addActionListener(action);
@@ -175,7 +187,7 @@ public class AccountView extends JFrame {
 		button_search.addActionListener(action);
 		button_search.setBounds(108, 365, 84, 22);
 		contentPane.add(button_search);
-		
+
 		button_cancel = new Button("Cancel");
 		button_cancel.addActionListener(action);
 		button_cancel.setBounds(249, 365, 84, 22);
@@ -183,17 +195,28 @@ public class AccountView extends JFrame {
 
 	}
 
-	public void refreshTable() {
+	private void refreshTable() {
 		List<Account> acounts = accountDao.selectAll();
 		accountModel.setData(acounts);
 		accountModel.fireTableDataChanged();
 //		accountModel.fireTableStructureChanged();
 	}
 
+	private void setEmptyTextField() {
+		textField_accountType.setText(null);
+		textField_username.setText(null);
+		passwordField_password.setText(null);
+		textField_twoFA.setText(null);
+		textField_phonenumber.setText(null);
+		textField_email.setText(null);
+		passwordField_passMail.setText(null);
+	}
+
 	private Account accountInfo() {
+
 		String accountType = textField_accountType.getText();
 		String username = textField_username.getText();
-		String password =new String(passwordField_password.getPassword());
+		String password = new String(passwordField_password.getPassword());
 		String twoFA = textField_twoFA.getText();
 		String phonenumber = textField_phonenumber.getText();
 		String email = textField_email.getText();
@@ -203,10 +226,18 @@ public class AccountView extends JFrame {
 	}
 
 	public void addAccount() {
+
 		try {
-			accountDao.insert(accountInfo());
-			button_edit.setLabel("Edit");
-			refreshTable();
+			if (!accountModel.checkEmptyTextField(textField_accountType)
+					|| !accountModel.checkEmptyTextField(textField_email)
+					|| !accountModel.checkEmptyPasswordField(passwordField_password)) {
+				accountDao.insert(accountInfo());
+				setEmptyTextField();
+				refreshTable();
+			} else {
+				JOptionPane.showMessageDialog(this, "Mời nhập thông tin tài khoản:\n", "Lỗi",
+						JOptionPane.ERROR_MESSAGE);
+			}
 		} catch (Throwable ex) {
 			JOptionPane.showMessageDialog(this, "Lỗi thêm tài khoản:\n" + ex.getMessage(), "Lỗi",
 					JOptionPane.ERROR_MESSAGE);
@@ -230,20 +261,25 @@ public class AccountView extends JFrame {
 	}
 
 	public void editAccount() {
-		textField_accountType.setText(getSelectedAccount().getAccountType() + "");
-		textField_username.setText(getSelectedAccount().getUsername());
-		passwordField_password.setText(getSelectedAccount().getPassword());
-		textField_twoFA.setText(getSelectedAccount().getTwoFA());
-		textField_phonenumber.setText(getSelectedAccount().getPhonenumber());
-		textField_email.setText(getSelectedAccount().getEmail());
-		passwordField_passMail.setText(getSelectedAccount().getPassMail());
+		try {
+			textField_accountType.setText(getSelectedAccount().getAccountType() + "");
+			textField_username.setText(getSelectedAccount().getUsername());
+			passwordField_password.setText(getSelectedAccount().getPassword());
+			textField_twoFA.setText(getSelectedAccount().getTwoFA());
+			textField_phonenumber.setText(getSelectedAccount().getPhonenumber());
+			textField_email.setText(getSelectedAccount().getEmail());
+			passwordField_passMail.setText(getSelectedAccount().getPassMail());
 
-		button_edit.setLabel("Save");
+			button_edit.setLabel("Save");
+
+		} catch (Throwable ex) {
+			JOptionPane.showMessageDialog(this, "Mời 1 Tài khoản để Edit:\n" + ex.getMessage(), "Lỗi",
+					JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	public void saveAccount() {
 
-		
 		try {
 			int id = getSelectedAccount().getId();
 			account = accountInfo();
@@ -257,9 +293,30 @@ public class AccountView extends JFrame {
 	}
 
 	public void deleteAccount() {
-		account = getSelectedAccount();
-		accountDao.delete(account);
-		refreshTable();
+		try {
+			account = getSelectedAccount();
+			accountDao.delete(account);
+			refreshTable();
+		} catch (Throwable ex) {
+			JOptionPane.showMessageDialog(this, "Mời 1 Tài khoản để Delete:\n" + ex.getMessage(), "Lỗi",
+					JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	public void copyPassword() {
+		String password = new String(passwordField_password.getPassword());
+		accountModel.copyToClipboard(password);
+		JOptionPane.showMessageDialog(this, "Password copied to clipboard.", "Success",
+				JOptionPane.INFORMATION_MESSAGE);
+		System.out.println(password);
+	}
+
+	public void copyPassmail() {
+		String passMail = new String(passwordField_passMail.getPassword());
+		accountModel.copyToClipboard(passMail);
+		JOptionPane.showMessageDialog(this, "Password copied to clipboard.", "Success",
+				JOptionPane.INFORMATION_MESSAGE);
+		System.out.println(passMail);
 	}
 
 	public void searchAccount() {
@@ -270,15 +327,16 @@ public class AccountView extends JFrame {
 			List<Account> listAccount = accountDao.getAccount(account);
 			accountModel.setData(listAccount);
 			accountModel.fireTableDataChanged();
-			
+
 		} catch (Throwable ex) {
 			JOptionPane.showMessageDialog(this, "Lỗi tìm kiếm tài khoản: \n" + ex);
 		}
-		
+
 	}
 
 	public void cancelSearch() {
+		textField_search_accountType.setText("");
+		textField_search_username.setText("");
 		refreshTable();
-		System.out.println("Cancel Search");
 	}
 }

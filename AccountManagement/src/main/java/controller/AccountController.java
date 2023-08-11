@@ -3,6 +3,9 @@ package controller;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+
 import model.Account;
 import viewer.AccountView;
 
@@ -26,12 +29,15 @@ public class AccountController implements ActionListener {
 			System.out.println(acctionCommand);
 		} else if (acctionCommand.equals("Delete")) {
 			view.deleteAccount();
-		}else if (acctionCommand.equals("Search")) {
+		}else if (acctionCommand.equals("Copy Password")) {
+			view.copyPassword();
+		}else if (acctionCommand.equals("Copy Pass Mail")) {
+			view.copyPassmail();
+		} else if (acctionCommand.equals("Search")) {
 			view.searchAccount();
-		}else if (acctionCommand.equals("Cancel")) {
+		} else if (acctionCommand.equals("Cancel")) {
 			view.cancelSearch();
 		}
 
 	}
-
 }
