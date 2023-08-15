@@ -37,7 +37,12 @@ public class AccountController implements ActionListener {
 			view.searchAccount();
 		} else if (acctionCommand.equals("Cancel")) {
 			view.cancelSearch();
-		}
-
+		}else if (acctionCommand.equals("Random Password")) {
+			view.createRandomPwd();
+		} else if (acctionCommand.equals("Create 2FA code")) {
+			view.createOtpGenerator();
+		}  else if (acctionCommand.equals("Exit")) {
+			view.closeApp();
+		} 
 	}
 }

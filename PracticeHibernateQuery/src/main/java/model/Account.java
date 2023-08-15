@@ -21,8 +21,8 @@ public class Account {
 	private String username;
 	private String password;
 
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "protect_method")
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true )
+	@JoinColumn(name = "protect_id")
 	private AccountProtection accountProtection;
 
 	public Account() {

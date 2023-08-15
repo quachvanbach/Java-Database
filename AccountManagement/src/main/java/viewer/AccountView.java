@@ -1,9 +1,15 @@
 package viewer;
 
 import java.awt.EventQueue;
+import java.awt.HeadlessException;
+
+import org.passay.*;
+import org.hibernate.SessionFactory;
+import org.jboss.aerogear.security.otp.Totp;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -13,6 +19,7 @@ import controller.AccountController;
 import dao.AccountDAO;
 import model.Account;
 import model.AccountModel;
+import util.HibernateUtil;
 
 import java.awt.ScrollPane;
 import javax.swing.JTable;
@@ -22,10 +29,15 @@ import java.awt.Label;
 import java.awt.TextField;
 import java.awt.Window;
 import java.awt.event.ActionListener;
+import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.List;
 import java.awt.Button;
 import java.awt.Component;
 import javax.swing.JSeparator;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 
 public class AccountView extends JFrame {
 
@@ -59,6 +71,11 @@ public class AccountView extends JFrame {
 	private Button button_cancel;
 	private Button button_copyPassword;
 	private Button button_copyPassMail;
+	private JMenuItem mntmNewMenuItem;
+	private JMenuItem menuItem_Exit;
+	private JMenu menu_tool;
+	private JMenuItem menuItem_randomPassword;
+	private JMenuItem menuItem_create2FA;
 
 	public AccountView() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -72,6 +89,31 @@ public class AccountView extends JFrame {
 
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+
+		JMenuBar menuBar = new JMenuBar();
+		menuBar.setBounds(0, 0, 101, 22);
+		contentPane.add(menuBar);
+
+		JMenu menu_file = new JMenu("File");
+		menuBar.add(menu_file);
+
+		mntmNewMenuItem = new JMenuItem("New menu item");
+		menu_file.add(mntmNewMenuItem);
+
+		menuItem_Exit = new JMenuItem("Exit");
+		menuItem_Exit.addActionListener(action);
+		menu_file.add(menuItem_Exit);
+
+		menu_tool = new JMenu("Tool");
+		menuBar.add(menu_tool);
+
+		menuItem_randomPassword = new JMenuItem("Random Password");
+		menuItem_randomPassword.addActionListener(action);
+		menu_tool.add(menuItem_randomPassword);
+
+		menuItem_create2FA = new JMenuItem("Create 2FA code");
+		menuItem_create2FA.addActionListener(action);
+		menu_tool.add(menuItem_create2FA);
 
 		table = new JTable(accountModel);
 //		table.setModel(accountModel);
@@ -269,7 +311,7 @@ public class AccountView extends JFrame {
 			textField_phonenumber.setText(getSelectedAccount().getPhonenumber());
 			textField_email.setText(getSelectedAccount().getEmail());
 			passwordField_passMail.setText(getSelectedAccount().getPassMail());
-
+			
 			button_edit.setLabel("Save");
 
 		} catch (Throwable ex) {
@@ -281,12 +323,15 @@ public class AccountView extends JFrame {
 	public void saveAccount() {
 
 		try {
-			int id = getSelectedAccount().getId();
+			Account oldAccount = getSelectedAccount();
+			int id = oldAccount.getId();
 			account = accountInfo();
 			account.setId(id);
 			accountDao.update(account);
 			button_edit.setLabel("Edit");
+			setEmptyTextField();
 			refreshTable();
+			accountModel.recordOperationLog("Update: "+oldAccount.toString()+" to "+ account.toString()+"\n");
 		} catch (Throwable ex) {
 			JOptionPane.showMessageDialog(this, "Lỗi sửa tài khoản: \n" + ex);
 		}
@@ -338,5 +383,78 @@ public class AccountView extends JFrame {
 		textField_search_accountType.setText("");
 		textField_search_username.setText("");
 		refreshTable();
+	}
+
+	public void createRandomPwd() {
+		boolean validInput = false;
+
+		while (!validInput) {
+			String input = JOptionPane.showInputDialog(null, "Enter password length (between 20 and 50):");
+			try {
+				int passwordLength = Integer.parseInt(input);
+				if (passwordLength >= 20 && passwordLength <= 50) {
+					generateRandomPassword(passwordLength);
+					validInput = true; // Exit the loop if input is valid
+				} else {
+					JOptionPane.showMessageDialog(null, "Please enter a number between 20 and 50.");
+				}
+			} catch (NumberFormatException e) {
+				JOptionPane.showMessageDialog(null, "Please enter a valid number.");
+			}
+		}
+	}
+
+	public void createOtpGenerator() {
+		try {
+			JTextField secretKeyField = new JTextField(30);
+
+			JPanel panel = new JPanel();
+			panel.add(new JLabel("Enter Secret Key:"));
+			panel.add(secretKeyField);
+
+			int result = JOptionPane.showConfirmDialog(null, panel, "Generate OTP", JOptionPane.OK_CANCEL_OPTION);
+			if (result == JOptionPane.OK_OPTION) {
+				String secretKey = secretKeyField.getText();
+				otpGenerator(secretKey);
+			}
+		} catch (HeadlessException e) {
+			JOptionPane.showMessageDialog(button_add, "Nhập sai định dạng khoá bí mật! Mời nhập lại.");
+		}
+	}
+
+	private void generateRandomPassword(int passwordLength) {
+		PasswordGenerator generator = new PasswordGenerator();
+		List<CharacterRule> rules = Arrays.asList(new CharacterRule(EnglishCharacterData.UpperCase, 1),
+				new CharacterRule(EnglishCharacterData.LowerCase, 1), new CharacterRule(EnglishCharacterData.Digit, 1),
+				new CharacterRule(EnglishCharacterData.Special, 1));
+
+		String randomPassword = generator.generatePassword(passwordLength, rules);
+
+		accountModel.copyToClipboard(randomPassword);
+		JOptionPane.showMessageDialog(menuItem_randomPassword, "Đã tạo mật khẩu ngẫu nhiên gồm " + passwordLength
+				+ " ký tự.\n" + "Mật khẩu đã được lưu vào Clipboard. Ctrl+V để dán mật khẩu.");
+	}
+
+	private void otpGenerator(String secretKey) {
+		try {
+			Totp totp = new Totp(secretKey);
+			String otp = totp.now();
+
+			accountModel.copyToClipboard(otp);
+
+			long currentTime = System.currentTimeMillis() / 1000;
+			long timeWindow = 30; // 30-second time window
+			long remainingSeconds = timeWindow - (currentTime % timeWindow);
+
+			JOptionPane.showMessageDialog(null, "Mã OTP là: " + otp + "  đã được copy vào Clipboard.\n"
+					+ "Thời gian thay đổi mã còn " + remainingSeconds + " giây.");
+		} catch (Throwable e) {
+			JOptionPane.showMessageDialog(button_add, "Nhập sai định dạng khoá bí mật! Mời nhập lại.");
+		}
+	}
+
+	public void closeApp() {
+		HibernateUtil.shutdown();
+		System.exit(0);
 	}
 }

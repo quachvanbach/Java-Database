@@ -16,15 +16,13 @@ public interface DAO<T> {
 
 	public boolean delete(T t);
 
-	public List<T> join(T t, T t1);
+	public List<T> join();
 
 	public List<T> orderBy(T t);
 
 	public List<Object[]> groupBy(T t);
 
 	public List<Object[]> having(T t);
-
-	public List<T> join(T t);
 
 	public List<T> distinct(T t);
 }

@@ -8,18 +8,18 @@ public class HibernateUtil {
 
 	private static SessionFactory buildSessionFactory() {
 		try {
-			return new Configuration().configure().buildSessionFactory();
+			return new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
 		} catch (Throwable ex) {
-			System.out.println("Lỗi config sessionFactory");
+			System.out.println("Lỗi..." + ex);
 			return null;
 		}
 	}
-
+	
 	public static SessionFactory getSessionFactory() {
 		return sessionFactory;
 	}
-
-	public static void close() {
+	
+	public static void shutdown() {
 		sessionFactory.close();
 	}
 }

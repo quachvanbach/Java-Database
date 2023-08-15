@@ -1,5 +1,6 @@
 package model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -21,11 +22,15 @@ public class AccountProtection {
 	private String fullName;
 	private String email;
 	private String passmail;
-
+	
+	@OneToOne(mappedBy = "accountProtection")
+	private Account account;
+	
 	public AccountProtection() {
 	}
 
 	public AccountProtection(String twoFA, String fullName, String email, String passmail) {
+		super();
 		this.twoFA = twoFA;
 		this.fullName = fullName;
 		this.email = email;
@@ -33,7 +38,7 @@ public class AccountProtection {
 	}
 
 	public AccountProtection(int protectId, String twoFA, String fullName, String email, String passmail) {
-		super();
+
 		this.protectId = protectId;
 		this.twoFA = twoFA;
 		this.fullName = fullName;
@@ -83,8 +88,10 @@ public class AccountProtection {
 
 	@Override
 	public String toString() {
-		return "AccountProtection [id=" + protectId + ", twoFA=" + twoFA + ", fullName=" + fullName + ", email=" + email
-				+ ", passmail=" + passmail + "]";
+		return "AccountProtection [protectId=" + protectId + ", twoFA=" + twoFA + ", fullName=" + fullName + ", email="
+				+ email + ", passmail=" + passmail + "]";
 	}
+
+
 
 }

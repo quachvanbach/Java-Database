@@ -121,8 +121,8 @@ public class Account {
 
 	@Override
 	public String toString() {
-		return "Account [id=" + id + ", accountType=" + accountType + ", username=" + username + ", password="
-				+ password + ", twoFA=" + twoFA + ", phonenumber=" + phonenumber + ", email=" + email + ", passMail="
+		return "Account [id = " + id + ", accountType = " + accountType + ", username = " + username + ", password = "
+				+ password + ", twoFA = " + twoFA + ", phonenumber = " + phonenumber + ", email = " + email + ", passMail = "
 				+ passMail + "]";
 	}
 	

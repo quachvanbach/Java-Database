@@ -4,17 +4,23 @@ import java.awt.TextField;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.logging.Logger;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-import javax.print.attribute.standard.Sides;
 import javax.swing.JPasswordField;
 import javax.swing.table.AbstractTableModel;
 
 public class AccountModel extends AbstractTableModel {
 	private List<Account> data;
-	private final String[] columnNames  = new String[] { "ID", "Account Type", "Username", "Password", "2FA", "Phonenumber", "Email",
-	"Pass Mail" };;
+	private final String[] columnNames = new String[] { "ID", "Account Type", "Username", "Password", "2FA",
+			"Phonenumber", "Email", "Pass Mail" };;
 
 	public AccountModel() {
 		data = new ArrayList<Account>();
@@ -72,9 +78,9 @@ public class AccountModel extends AbstractTableModel {
 	public void copyToClipboard(String text) {
 		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 		StringSelection selection = new StringSelection(text);
-		clipboard.setContents(selection,null);
+		clipboard.setContents(selection, null);
 	}
-	
+
 	public boolean checkEmptyTextField(TextField textField) {
 		if (textField.getText().isEmpty()) {
 			return true;
@@ -82,7 +88,7 @@ public class AccountModel extends AbstractTableModel {
 			return false;
 		}
 	}
-	
+
 	public boolean checkEmptyPasswordField(JPasswordField passwordField) {
 		char[] passwordChars = passwordField.getPassword();
 		String password = new String(passwordChars);
@@ -91,5 +97,16 @@ public class AccountModel extends AbstractTableModel {
 		} else {
 			return false;
 		}
+	}
+
+	public void recordOperationLog(String string) {
+		String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        String logMessage = "[" + timeStamp + "] :" + string;
+
+        try (PrintWriter out = new PrintWriter(new FileWriter("mylog.log", true))) {
+            out.println(new String(logMessage.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 	}
 }
