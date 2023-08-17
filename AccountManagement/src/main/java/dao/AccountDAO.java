@@ -1,6 +1,5 @@
 package dao;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -10,7 +9,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import model.Account;
-import net.bytebuddy.asm.Advice.Return;
 import util.HibernateUtil;
 
 public class AccountDAO implements DAO<Account> {

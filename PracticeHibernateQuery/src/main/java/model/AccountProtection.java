@@ -23,8 +23,8 @@ public class AccountProtection {
 	private String email;
 	private String passmail;
 	
-	@OneToOne(mappedBy = "accountProtection")
-	private Account account;
+//	@OneToOne(mappedBy = "accountProtection")
+//	private Account account;
 	
 	public AccountProtection() {
 	}

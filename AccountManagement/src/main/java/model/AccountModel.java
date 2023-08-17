@@ -14,13 +14,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JPasswordField;
 import javax.swing.table.AbstractTableModel;
 
 public class AccountModel extends AbstractTableModel {
 	private List<Account> data;
 	private final String[] columnNames = new String[] { "ID", "Account Type", "Username", "Password", "2FA",
-			"Phonenumber", "Email", "Pass Mail" };;
+			"Phonenumber", "Email", "Pass Mail" };
 
 	public AccountModel() {
 		data = new ArrayList<Account>();
