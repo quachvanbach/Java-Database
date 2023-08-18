@@ -2,6 +2,7 @@ package dao;
 
 import java.util.List;
 
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -11,16 +12,15 @@ import model.Customer;
 import util.HibernateUtil;
 
 public class CustomerDAO implements DAO<Customer> {
-
 	@Override
 	public List<Customer> selectAll() {
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
 			String hql = "from Customer";
 			Query<Customer> query = session.createQuery(hql, Customer.class);
-			List<Customer> Customers = query.list();
-			session.close();
-			return Customers;
+			List<Customer> customers = query.list();
+//			session.close();
+			return customers;
 		} catch (HibernateException e) {
 			System.out.println("Lỗi hàm selectAll()");
 			e.printStackTrace();
@@ -30,8 +30,19 @@ public class CustomerDAO implements DAO<Customer> {
 
 	@Override
 	public Customer selectById(Customer t) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+			String hql = "from Customer where id = :id";
+			Query<Customer> query = session.createQuery(hql, Customer.class);
+			query.setParameter("id", t.getId());
+			Customer customer = query.uniqueResult();
+			session.close();
+			return customer;
+		} catch (HibernateException e) {
+			System.out.println("Lỗi hàm selectById của Customer");
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override
@@ -43,7 +54,7 @@ public class CustomerDAO implements DAO<Customer> {
 			session.saveOrUpdate(t);
 
 			transaction.commit();
-			session.close();
+			session.close(); 
 			return true;
 		} catch (Exception e) {
 			System.out.println("Lỗi hàm insert()");

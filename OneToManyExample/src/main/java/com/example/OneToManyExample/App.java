@@ -9,10 +9,11 @@ import dao.CustomerDAO;
 import dao.InvoiceDAO;
 import model.Customer;
 import model.Invoice;
-import viewer.Viewer;
+import viewer.AppView;
 
 public class App {
 	public static void main(String[] args) {
-
+		AppView view = new AppView();
+		view.setVisible(true); 
 	}
 }

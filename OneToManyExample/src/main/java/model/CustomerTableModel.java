@@ -3,12 +3,11 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JButton;
 import javax.swing.table.AbstractTableModel;
 
 public class CustomerTableModel extends AbstractTableModel {
 	private List<Customer> data;
-	private final String[] columnNames = new String[] { "ID", "Fullname", "Phonenumber", "Invoice"};
+	private final String[] columnNames = new String[] { "ID", "Fullname", "Phonenumber", "Email", "Address", "Invoice" };
 
 	public CustomerTableModel() {
 		data = new ArrayList<Customer>();
@@ -19,8 +18,8 @@ public class CustomerTableModel extends AbstractTableModel {
 	}
 
 	public void addrow(Customer customer) {
-		data.add(customer);
 		fireTableDataChanged(); // Dùng thông báo sự thay đổi dữ liệu
+		data.add(customer);
 	}
 
 	@Override
@@ -49,10 +48,19 @@ public class CustomerTableModel extends AbstractTableModel {
 		case 2:
 			return customer.getPhonenumber();
 		case 3:
-			return customer.getInvoices();
-	
+			return customer.getEmail();
+		case 4:
+			return customer.getAddress();
+		case 5:
+			return "View invoices"; // Giá trị kiểu nút
+
 		default:
 			return null;
 		}
+	}
+
+	@Override
+	public boolean isCellEditable(int rowIndex, int columnIndex) {
+		return columnIndex == 5; // Chỉ cột kiểu nút là có thể sửa
 	}
 }

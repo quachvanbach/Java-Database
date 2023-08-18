@@ -13,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
 import controller.AccountController;
@@ -115,14 +116,13 @@ public class AccountView extends JFrame {
 		menuItem_create2FA.addActionListener(action);
 		menu_tool.add(menuItem_create2FA);
 
-		table = new JTable(accountModel);
-//		table.setModel(accountModel);
+		table = new JTable();
+		table.setModel(accountModel);
 		table.setBounds(167, 156, 1, 1);
 
-		ScrollPane scrollPane = new ScrollPane();
-		scrollPane.setBounds(456, 0, 665, 437);
-		scrollPane.add(table);
-		contentPane.add(scrollPane);
+		JScrollPane jScrollPane = new JScrollPane(table); // Sử dụng JScrollPane thay cho ScrollPane và thêm trực tiếp table vào khi khởi tạo để hiển thị toàn bộ bảng 1 cách đầy đủ.
+		jScrollPane.setBounds(456, 0, 665, 437);
+		contentPane.add(jScrollPane);
 
 		label_accountType = new Label("Account Type");
 		label_accountType.setBounds(10, 38, 92, 22);

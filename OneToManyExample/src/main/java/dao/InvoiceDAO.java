@@ -1,5 +1,6 @@
 package dao;
 
+
 import java.util.List;
 
 import org.hibernate.Session;
@@ -28,8 +29,19 @@ public class InvoiceDAO implements DAO<Invoice> {
 
 	@Override
 	public Invoice selectById(Invoice t) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+			String hql = "from Invoice where invoice_id = :invoice_id";
+			Query<Invoice> query = session.createQuery(hql, Invoice.class);
+			query.setParameter("customer", t.getInvoice_id());
+			Invoice invoice = query.uniqueResult();
+			session.close();
+			return invoice;
+		} catch (Exception e) {
+			System.out.println("Lỗi hàm selectById của Invoice");
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override
@@ -37,7 +49,9 @@ public class InvoiceDAO implements DAO<Invoice> {
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
 			Transaction transaction = session.beginTransaction();
+			
 			session.saveOrUpdate(t);
+			
 			transaction.commit();
 			session.close();
 			return true;

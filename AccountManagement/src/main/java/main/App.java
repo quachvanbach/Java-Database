@@ -9,5 +9,4 @@ public class App {
 		AccountView view = new AccountView();
 				view.setVisible(true);
 	}
-
 }

@@ -1,5 +1,8 @@
 package model;
 
+import java.sql.Date;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -7,82 +10,45 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
+@Getter
+@Setter
+@ToString
 @Table(name = "invoice")
 public class Invoice {
 	@Id
+	@Column(name = "invoice_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int invoice_id;
+	@Column(name = "date")
+	private Date date;
+	@Column(name = "item_name")
 	private String itemName;
+	@Column(name = "quantity")
 	private double quantity;
-	private double price;	
-	
+	@Column(name = "price")
+	private double price;
+	@Column(name = "total_amount")
+	private double totalAmount = quantity * price;
+
 	@ManyToOne
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
 
-	public Invoice() {
-	}
-
-	public Invoice(String itemName, double quantity, double price, Customer customer) {
+	public Invoice(Date date, String itemName, double quantity, double price, Customer customer) {
+		super();
+		this.date = date;
 		this.itemName = itemName;
 		this.quantity = quantity;
 		this.price = price;
 		this.customer = customer;
-	}
-
-	public Invoice(int invoice_id, String itemName, double quantity, double price, Customer customer) {
-		this.invoice_id = invoice_id;
-		this.itemName = itemName;
-		this.quantity = quantity;
-		this.price = price;
-		this.customer = customer;
-	}
-
-	public int getInvoice_id() {
-		return invoice_id;
-	}
-
-	public void setInvoice_id(int invoice_id) {
-		this.invoice_id = invoice_id;
-	}
-
-	public String getItemName() {
-		return itemName;
-	}
-
-	public void setItemName(String itemName) {
-		this.itemName = itemName;
-	}
-
-	public double getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(double quantity) {
-		this.quantity = quantity;
-	}
-
-	public double getPrice() {
-		return price;
-	}
-
-	public void setPrice(double price) {
-		this.price = price;
-	}
-
-	public Customer getCustomer() {
-		return customer;
-	}
-
-	public void setCustomer(Customer customer) {
-		this.customer = customer;
-	}
-
-	@Override
-	public String toString() {
-		return "Invoice [invoice_id=" + invoice_id + ", itemName=" + itemName + ", quantity=" + quantity + ", price="
-				+ price + ", customer=" + customer + "]";
 	}
 }
