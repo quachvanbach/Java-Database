@@ -7,19 +7,20 @@ import javax.swing.table.AbstractTableModel;
 
 public class CustomerTableModel extends AbstractTableModel {
 	private List<Customer> data;
-	private final String[] columnNames = new String[] { "ID", "Fullname", "Phonenumber", "Email", "Address", "Invoice" };
+	private final String[] columnNames = new String[] { "ID", "Fullname", "Phonenumber", "Email", "Address",
+			"Invoice" };
 
 	public CustomerTableModel() {
 		data = new ArrayList<Customer>();
 	}
 
-	public void setData(List<Customer> data) {
+	public void setCustomers(List<Customer> data) {
 		this.data = data;
 	}
 
 	public void addrow(Customer customer) {
-		fireTableDataChanged(); // Dùng thông báo sự thay đổi dữ liệu
 		data.add(customer);
+		fireTableDataChanged(); // Dùng thông báo sự thay đổi dữ liệu
 	}
 
 	@Override
@@ -57,6 +58,12 @@ public class CustomerTableModel extends AbstractTableModel {
 		default:
 			return null;
 		}
+	}
+
+	public Customer getCustomerAt(int rowIndex) {
+		Customer customer = data.get(rowIndex);
+		return customer;
+
 	}
 
 	@Override

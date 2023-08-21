@@ -9,20 +9,20 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
-import controller.Controller;
+import controller.AppController;
 import viewer.AppView;
+import viewer.CustomView;
 
 public class ButtonCellEditor extends AbstractCellEditor implements TableCellEditor, TableCellRenderer {
-	private JButton button;
-	private Object view;
-	private CustomerTableModel customerTableModel = new CustomerTableModel();
+	public JButton button;
+	private AppView appView;
+//	private CustomerTableModel customerTableModel = new CustomerTableModel();
 	
-	public ButtonCellEditor(AppView view) {
-		this.view = view;
-		button = new JButton("Click Me");
+	public ButtonCellEditor(AppView appView) {
+		this.appView = appView;
+		button = new JButton();
 //		 Xử lý sự kiện khi nút được nhấn
-		button.addActionListener(new Controller(view) {
-			
+		button.addActionListener(new AppController(appView) {		
 		});
 	}
 

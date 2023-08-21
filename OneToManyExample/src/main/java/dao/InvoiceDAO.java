@@ -33,7 +33,7 @@ public class InvoiceDAO implements DAO<Invoice> {
 			Session session = HibernateUtil.getSessionFactory().openSession();
 			String hql = "from Invoice where invoice_id = :invoice_id";
 			Query<Invoice> query = session.createQuery(hql, Invoice.class);
-			query.setParameter("customer", t.getInvoice_id());
+			query.setParameter("invoice_id", t.getInvoice_id());
 			Invoice invoice = query.uniqueResult();
 			session.close();
 			return invoice;
@@ -49,7 +49,7 @@ public class InvoiceDAO implements DAO<Invoice> {
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
 			Transaction transaction = session.beginTransaction();
-			
+			t.setTotalAmount(t.getQuantity()*t.getPrice());
 			session.saveOrUpdate(t);
 			
 			transaction.commit();

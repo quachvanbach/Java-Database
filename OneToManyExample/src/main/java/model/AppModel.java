@@ -1,5 +1,8 @@
 package model;
 
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.util.List;
 
 import javax.persistence.criteria.CriteriaBuilder.In;
@@ -24,7 +27,12 @@ public class AppModel {
 			Query<Customer> customerQuery = session.createQuery(getCustomerHQL, Customer.class);
 			customerQuery.setParameter("id", customer.getId());
 			Customer customerResult = customerQuery.uniqueResult();
+			System.out.println("Khách hàng lấy được trong getInvoiceByCustomer" + customerResult);
 			List<Invoice> invoices = customerResult.getInvoices();
+			System.out.println("Những đơn hàng tìm được trong getInvoiceByCustomer");
+			for (Invoice invoice : invoices) {
+				System.out.println(invoice);
+			}
 			session.close();
 			return invoices;
 		} catch (Exception e) {
@@ -32,5 +40,13 @@ public class AppModel {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public Point getScreenSize() {
+		 Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+	        int screenWidth = screenSize.width;
+	        int screenHeight = screenSize.height;
+	        Point point = new Point(screenWidth,screenHeight);
+			return point;
 	}
 }

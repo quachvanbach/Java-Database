@@ -7,7 +7,8 @@ import javax.swing.table.AbstractTableModel;
 
 public class InvoiceTableModel extends AbstractTableModel {
 	private List<Invoice> invoices;
-	private String[] columnNames = { "ID", "Item name", "Quantity", "Price", "Customer ID" };
+	private String[] columnNames = { "ID", "Purchase date", "Item name", "Quantity", "Price", "Total amount",
+			"Customer ID" };
 
 	public InvoiceTableModel() {
 		invoices = new ArrayList<Invoice>();
@@ -16,6 +17,7 @@ public class InvoiceTableModel extends AbstractTableModel {
 	public void setInvoices(List<Invoice> invoices) {
 		this.invoices = invoices;
 		fireTableDataChanged();
+
 	}
 
 	@Override
@@ -48,9 +50,9 @@ public class InvoiceTableModel extends AbstractTableModel {
 		case 4:
 			return invoice.getPrice();
 		case 5:
-			return invoice.getTotalAmount();
+			return invoice.getPrice() * invoice.getPrice();
 		case 6:
-			return invoice.getCustomer().getId();
+			return "Show customer";
 
 		default:
 			return null;
@@ -65,8 +67,8 @@ public class InvoiceTableModel extends AbstractTableModel {
 		this.columnNames = columnNames;
 	}
 
-	public List<Invoice> getInvoices() {
-		return invoices;
+	@Override
+	public boolean isCellEditable(int rowIndex, int columnIndex) {
+		return columnIndex == 6; // Chỉ cột kiểu nút là có thể sửa
 	}
-
 }

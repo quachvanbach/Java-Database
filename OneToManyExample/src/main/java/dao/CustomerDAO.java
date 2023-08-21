@@ -44,15 +44,14 @@ public class CustomerDAO implements DAO<Customer> {
 			return null;
 		}
 	}
-
-	@Override
-	public boolean insert(Customer t) {
+	
+	private boolean saveOrUpdate(Customer t) {
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
 			Transaction transaction = session.beginTransaction();
-
+			
 			session.saveOrUpdate(t);
-
+			
 			transaction.commit();
 			session.close(); 
 			return true;
@@ -64,9 +63,13 @@ public class CustomerDAO implements DAO<Customer> {
 	}
 
 	@Override
+	public boolean insert(Customer t) {
+		return saveOrUpdate(t);
+	}
+
+	@Override
 	public boolean update(Customer t) {
-		// TODO Auto-generated method stub
-		return false;
+		return saveOrUpdate(t);
 	}
 
 	@Override

@@ -1,18 +1,15 @@
 package viewer;
 
-import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 
-import controller.Controller;
+import controller.AppController;
 import dao.CustomerDAO;
 import dao.InvoiceDAO;
 import model.AppModel;
@@ -22,113 +19,265 @@ import model.CustomerTableModel;
 import model.Invoice;
 import model.InvoiceTableModel;
 
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.persistence.criteria.CriteriaBuilder.In;
-import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import org.eclipse.wb.swing.FocusTraversalOnArray;
-import org.hibernate.Hibernate;
 
+import java.awt.Button;
 import java.awt.Component;
+import javax.swing.JToggleButton;
+import javax.swing.JButton;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.Panel;
+import java.awt.Font;
+import java.awt.Color;
+import javax.swing.border.LineBorder;
 
 public class AppView extends JFrame {
-
 	private CustomerTableModel customerTableModel = new CustomerTableModel();
 	private InvoiceTableModel invoiceTableModel = new InvoiceTableModel();
 	private CustomerDAO customerDAO = new CustomerDAO();
 	private InvoiceDAO invoiceDao = new InvoiceDAO();
-	CustomizeCustomer customizeCustomer = new CustomizeCustomer();
-	CustomizeInvoice customizeInvoice = new CustomizeInvoice();
+	CustomView customView = new CustomView(this);
 	AppModel appModel = new AppModel();
-	private ButtonCellEditor buttonCellEditor = new ButtonCellEditor(this);
 	private Customer customer;
 	private Invoice invoice;
 	private JPanel contentPane;
-	private JTable table = new JTable();
-	private JButton btnAdd;
+	public JTable table = new JTable();
+	public JButton btnShowOption;
+	private JButton btnAddCustomer;
+	private JButton btnAddInvoice;
+	private JButton btnEditCustomer;
+	private JButton btnDeleteCustomer;
+	private JButton btnEditInvoice;
+	private JButton btnDeleteInvoice;
+	private JPanel panel_2;
+	private JPanel panel_3;
+	private JPanel panel_1;
 
 	public AppView() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 949, 522);
+		setBounds(486, 259, 931, 530);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setLocationRelativeTo(null);
+//		setLocationRelativeTo(null);
+		refreshtable();
 
-		ActionListener action = new Controller(this);
-
-		JMenuBar menuBar = new JMenuBar();
-		setJMenuBar(menuBar);
-
-		JMenuItem menuItem_back = new JMenuItem("Back");
-		menuItem_back.addActionListener(action);
-//		menuItem_back.disable();
-		menuBar.add(menuItem_back);
-
-		JMenuItem mntmNewMenuItem_1 = new JMenuItem("New menu item");
-		menuBar.add(mntmNewMenuItem_1);
+		ActionListener appAction = new AppController(this);
 
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		refreshtable();
-
-		btnAdd = new JButton("Add Customer");
-		btnAdd.addActionListener(action);
-		btnAdd.setBounds(10, 303, 89, 23);
-		contentPane.add(btnAdd);
-
-		table.getColumnModel().getColumn(5).setCellRenderer(buttonCellEditor);
-		table.getColumnModel().getColumn(5).setCellEditor(buttonCellEditor);
 		table.setBounds(0, 0, 1, 1);
+		table.setModel(customerTableModel);
 
 		JScrollPane scrollPane = new JScrollPane(table);
-		scrollPane.setBounds(384, 11, 539, 415);
+		scrollPane.setBounds(10, 11, 722, 469);
 		contentPane.add(scrollPane);
-		contentPane.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{btnAdd, scrollPane, table}));
+
+		btnShowOption = new JButton("Show invoices");
+		btnShowOption.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		btnShowOption.setBounds(10, 11, 143, 23);
+		btnShowOption.addActionListener(appAction);
+
+		btnAddCustomer = new JButton("Add customer");
+		btnAddCustomer.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		btnAddCustomer.setBounds(10, 20, 143, 23);
+		btnAddCustomer.addActionListener(appAction);
+
+		btnEditCustomer = new JButton("Edit customer");
+		btnEditCustomer.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		btnEditCustomer.setBounds(10, 63, 143, 23);
+		btnEditCustomer.addActionListener(appAction);
+
+		btnDeleteCustomer = new JButton("Delete customer");
+		btnDeleteCustomer.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		btnDeleteCustomer.setBounds(10, 106, 143, 23);
+		btnDeleteCustomer.addActionListener(appAction);
+
+		btnAddInvoice = new JButton("Add invoice");
+		btnAddInvoice.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		btnAddInvoice.setBounds(10, 20, 143, 23);
+		btnAddInvoice.addActionListener(appAction);
+
+		btnEditInvoice = new JButton("Edit invoice");
+		btnEditInvoice.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		btnEditInvoice.setBounds(10, 63, 143, 23);
+		btnEditInvoice.addActionListener(appAction);
+
+		btnDeleteInvoice = new JButton("Delete invoice");
+		btnDeleteInvoice.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		btnDeleteInvoice.setBounds(10, 106, 143, 23);
+		btnDeleteInvoice.addActionListener(appAction);
+
+		panel_1 = new JPanel();
+		panel_1.setBorder(new LineBorder(new Color(68, 68, 68)));
+		panel_1.setForeground(new Color(255, 255, 255));
+		panel_1.setBackground(new Color(255, 255, 255));
+		panel_1.setBounds(742, 10, 163, 150);
+		panel_1.setLayout(null);
+		panel_1.add(btnShowOption);
+		contentPane.add(panel_1);
+
+		panel_2 = new JPanel();
+		panel_2.setBorder(new LineBorder(new Color(68, 68, 68)));
+		panel_2.setForeground(new Color(255, 255, 255));
+		panel_2.setBackground(new Color(255, 255, 255));
+		panel_2.setBounds(742, 170, 163, 150);
+		panel_2.setLayout(null);
+		panel_2.add(btnAddCustomer);
+		panel_2.add(btnEditCustomer);
+		panel_2.add(btnDeleteCustomer);
+		contentPane.add(panel_2);
+
+		panel_3 = new JPanel();
+		panel_3.setBorder(new LineBorder(new Color(68, 68, 68)));
+		panel_3.setForeground(new Color(255, 255, 255));
+		panel_3.setBackground(new Color(255, 255, 255));
+		panel_3.setBounds(742, 330, 163, 150);
+		panel_3.setLayout(null);
+		panel_3.add(btnAddInvoice);
+		panel_3.add(btnEditInvoice);
+		panel_3.add(btnDeleteInvoice);
+		contentPane.add(panel_3);
+
 	}
 
 	public void refreshtable() {
 		List<Customer> customers = customerDAO.selectAll();
-		customerTableModel.setData(customers);
-		customerTableModel.fireTableDataChanged();
+		customerTableModel.setCustomers(customers);
 		table.setModel(customerTableModel);
-		table.getColumnModel().getColumn(5).setCellRenderer(buttonCellEditor);
-		table.getColumnModel().getColumn(5).setCellEditor(buttonCellEditor);
-		table.setBounds(0, 0, 1, 1);
+//		Point topLeft = this.getLocation();
+		customerTableModel.fireTableDataChanged();
+	}
+
+	public void showCustomersInformation() {
+		refreshtable();
+		btnShowOption.setText("Show invoices");
 	}
 
 	public void showInvoicesInformation() {
+		if (checkSelectedRow()) {
+			customer = new Customer();
+			int id = Integer.parseInt(table.getValueAt(table.getSelectedRow(), 0) + "");
+			customer.setId(id);
+			List<Invoice> invoices = appModel.getInvoiceByCustomer(customer);
+			invoiceTableModel.setInvoices(invoices);
+			table.setModel(invoiceTableModel);
+			btnShowOption.setText("Show customers");
+		} else {
+			JOptionPane.showMessageDialog(this, "Select a customer to add invoices!");
+		}
+	}
+
+	public void showCustom(boolean bl) {
+		if (bl) {
+			Point screenSize = appModel.getScreenSize();
+			this.setLocation((int) ((screenSize.getX() - ((this.getWidth()) + (customView.getWidth()))) / 2),
+					this.getY());
+			customView.setVisible(true);
+			Point customizeView = new Point(getX() + getWidth(), getY());
+			customView.setLocation(customizeView);
+		} else {
+			this.setLocationRelativeTo(null);
+			customView.setVisible(false);
+		}
+	}
+
+	public Customer selectedCustomer() {
+		int id = Integer.parseInt(table.getValueAt(table.getSelectedRow(), 0).toString());
 		customer = new Customer();
-		int id = Integer.parseInt(table.getValueAt(table.getSelectedRow(), 0) + "");
 		customer.setId(id);
-		List<Invoice> invoices = appModel.getInvoiceByCustomer(customer);
-		invoiceTableModel.setInvoices(invoices);
-		table.setModel(invoiceTableModel);
+		Customer selectedCustomer = customerDAO.selectById(customer);
+		return selectedCustomer;
 	}
 
-	public void goBack() {
-		refreshtable();
+	public boolean checkSelectedRow() {
+		if (table.getSelectedRow() == -1) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 
-//	private Customer getCustomerInfo() {
-//		return Customer.builder()
-//		.fullName(txtCustomerName.getText())
-//		.phonenumber(txtPhonenumber.getText())
-//		.email(txtEmail.getText())
-//		.address(txtAddress.getText())
-//		.build();
-//	}
-	
+	private Invoice selectedInvoice() {
+
+		int id = Integer.parseInt(table.getValueAt(table.getSelectedRow(), 0) + "");
+		invoice = new Invoice();
+		invoice.setInvoice_id(id);
+		return invoiceDao.selectById(invoice);
+	}
+
 	public void addCustomer() {
-//		customer = getCustomerInfo();
-//		customerDAO.insert(customer);
-//		refreshtable();
-        Point topLeft = getLocationOnScreen();
-        customizeCustomer.setLocation(topLeft.x + getWidth() - customizeCustomer.getWidth(), topLeft.y);
-        customizeCustomer.setVisible(true);
-		customizeCustomer.setVisible(true);
+		showCustom(true);
+		btnAddCustomer.setText("Save customer");
+	}
+
+	public void saveCustomer() {
+		if (btnAddCustomer.getText().equals("Save customer")) {
+			customer = customView.getInputCustomer();
+			customerDAO.insert(customer);
+			refreshtable();
+		} else if (btnEditCustomer.getText().equals("Save customer")) {
+			customer = new Customer();
+			customer = customView.getInputCustomer();
+			System.out.println("customer berfore" + customer.getId());
+
+			int id = selectedCustomer().getId();
+			customer.setId(id);
+
+			System.out.println("selectedid" + selectedCustomer().getId());
+			System.out.println("customer" + customer);
+
+			customerDAO.update(customer);
+			refreshtable();
+		}
+	}
+
+	public void editCustomer() {
+		if (checkSelectedRow()) {
+			customer = selectedCustomer();
+			customView.readCustomerInfomation(customer);
+			showCustom(true);
+			btnEditCustomer.setText("Save customer");
+		} else {
+			JOptionPane.showMessageDialog(this, "Select a customer to add invoices!");
+		}
+	}
+
+	public void deleteCustomer() {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void addInvoice() {
+		if (checkSelectedRow()) {
+			showCustom(true);
+			customView.readCustomerInfomation(selectedCustomer());
+			customView.forbitEditng();
+			btnAddInvoice.setText("Save invoice");
+		} else {
+			JOptionPane.showMessageDialog(this, "Select a customer to add invoices!");
+		}
+
+	}
+
+	public void saveInvoice() {
+		invoice = customView.getInputInvoice();
+		invoice.setCustomer(selectedCustomer());
+		System.out.println(invoice);
+		invoiceDao.insert(invoice);
+		System.out.println("save invoice");
+		System.out.println(customView.getInputInvoice().getDate());
+	}
+
+	public void editInvoice() {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void deleteInvoice() {
+		// TODO Auto-generated method stub
+
 	}
 }
