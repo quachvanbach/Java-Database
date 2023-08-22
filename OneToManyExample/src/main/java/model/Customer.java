@@ -3,6 +3,7 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -41,7 +42,7 @@ public class Customer {
 	@Column(name = "address")
 	private String address;
 
-	@OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "customer", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
 	private List<Invoice> invoices = new ArrayList<>();
 
 	public Customer(String fullName, String phonenumber, String email, String address, List<Invoice> invoices) {

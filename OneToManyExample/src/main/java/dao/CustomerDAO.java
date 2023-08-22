@@ -2,6 +2,8 @@ package dao;
 
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -44,20 +46,19 @@ public class CustomerDAO implements DAO<Customer> {
 			return null;
 		}
 	}
-	
+
 	private boolean saveOrUpdate(Customer t) {
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
 			Transaction transaction = session.beginTransaction();
-			
+
 			session.saveOrUpdate(t);
-			
+
 			transaction.commit();
-			session.close(); 
+			session.close();
 			return true;
 		} catch (Exception e) {
-			System.out.println("Lỗi hàm insert()");
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Error in the saveOrUpdate function of customer object " + e);
 			return false;
 		}
 	}
@@ -74,8 +75,19 @@ public class CustomerDAO implements DAO<Customer> {
 
 	@Override
 	public boolean delete(Customer t) {
-		// TODO Auto-generated method stub
-		return false;
+		try {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+			Transaction transaction = session.beginTransaction();
+
+			session.delete(t);
+
+			transaction.commit();
+			session.close();
+			return true;
+		} catch (Throwable ex) {
+			JOptionPane.showMessageDialog(null, "Function customer object deletion error " + ex);
+			return false;
+		}
 	}
 
 	@Override

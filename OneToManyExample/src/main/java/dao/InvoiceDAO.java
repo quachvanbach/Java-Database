@@ -1,7 +1,8 @@
 package dao;
 
-
 import java.util.List;
+
+import javax.swing.JOptionPane;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -21,8 +22,7 @@ public class InvoiceDAO implements DAO<Invoice> {
 			List<Invoice> invoices = query.list();
 			return invoices;
 		} catch (Exception e) {
-			System.out.println("Lỗi hàm selectAll");
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Function invoice object SelectAll invoices " + e);
 			return null;
 		}
 	}
@@ -38,40 +38,54 @@ public class InvoiceDAO implements DAO<Invoice> {
 			session.close();
 			return invoice;
 		} catch (Exception e) {
-			System.out.println("Lỗi hàm selectById của Invoice");
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Error in the saveOrUpdate function of customer object " + e);
 			return null;
 		}
 	}
 
 	@Override
 	public boolean insert(Invoice t) {
+		return saveOrUpdate(t);
+	}
+
+	private boolean saveOrUpdate(Invoice t) {
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
 			Transaction transaction = session.beginTransaction();
-			t.setTotalAmount(t.getQuantity()*t.getPrice());
+			t.setTotalAmount(t.getQuantity() * t.getPrice());
+
 			session.saveOrUpdate(t);
-			
+
 			transaction.commit();
 			session.close();
 			return true;
 		} catch (Exception e) {
-			System.out.println("Lỗi hàm insert()");
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Function invoice object addition error " + e);
+			return false;
+		}
+	}
+
+	@Override
+	public boolean delete(Invoice t) {
+		try {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+			Transaction transaction = session.beginTransaction();
+			t.setTotalAmount(t.getQuantity() * t.getPrice());
+
+			session.delete(t);
+
+			transaction.commit();
+			session.close();
+			return true;
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "Function invoice object deletion  error " + e);
 			return false;
 		}
 	}
 
 	@Override
 	public boolean update(Invoice t) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean delete(Invoice t) {
-		// TODO Auto-generated method stub
-		return false;
+		return saveOrUpdate(t);
 	}
 
 	@Override

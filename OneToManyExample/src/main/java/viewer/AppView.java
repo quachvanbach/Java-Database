@@ -2,6 +2,7 @@ package viewer;
 
 import java.awt.Point;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -13,7 +14,7 @@ import controller.AppController;
 import dao.CustomerDAO;
 import dao.InvoiceDAO;
 import model.AppModel;
-import model.ButtonCellEditor;
+//import model.ButtonCellEditor;
 import model.Customer;
 import model.CustomerTableModel;
 import model.Invoice;
@@ -48,15 +49,17 @@ public class AppView extends JFrame {
 	public JButton btnShowOption;
 	private JButton btnAddCustomer;
 	private JButton btnAddInvoice;
-	private JButton btnEditCustomer;
+	public JButton btnEditCustomer;
 	private JButton btnDeleteCustomer;
 	private JButton btnEditInvoice;
 	private JButton btnDeleteInvoice;
 	private JPanel panel_2;
 	private JPanel panel_3;
 	private JPanel panel_1;
+	private JButton btnCancel;
 
 	public AppView() {
+		setTitle("                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               ");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(486, 259, 931, 530);
 		contentPane = new JPanel();
@@ -64,10 +67,21 @@ public class AppView extends JFrame {
 //		setLocationRelativeTo(null);
 		refreshtable();
 
-		ActionListener appAction = new AppController(this);
+		ActionListener appAction = new AppController(this, customView);
 
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) { // Double-click
+                    int row = table.rowAtPoint(e.getPoint());
+                    if (row >= 0) {
+                       customView.readCustomerInfomation(selectedCustomer());
+                    }
+                }
+			}
+		});
 		table.setBounds(0, 0, 1, 1);
 		table.setModel(customerTableModel);
 
@@ -119,6 +133,12 @@ public class AppView extends JFrame {
 		panel_1.add(btnShowOption);
 		contentPane.add(panel_1);
 
+		btnCancel = new JButton("Cancel");
+		btnCancel.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		btnCancel.setBounds(10, 52, 143, 23);
+		btnCancel.addActionListener(appAction);
+		panel_1.add(btnCancel);
+
 		panel_2 = new JPanel();
 		panel_2.setBorder(new LineBorder(new Color(68, 68, 68)));
 		panel_2.setForeground(new Color(255, 255, 255));
@@ -149,6 +169,7 @@ public class AppView extends JFrame {
 		table.setModel(customerTableModel);
 //		Point topLeft = this.getLocation();
 		customerTableModel.fireTableDataChanged();
+		showCustom(true, true);
 	}
 
 	public void showCustomersInformation() {
@@ -166,18 +187,28 @@ public class AppView extends JFrame {
 			table.setModel(invoiceTableModel);
 			btnShowOption.setText("Show customers");
 		} else {
-			JOptionPane.showMessageDialog(this, "Select a customer to add invoices!");
+			List<Invoice> invoices = invoiceDao.selectAll();
+			invoiceTableModel.setInvoices(invoices);
+			table.setModel(invoiceTableModel);
+			btnShowOption.setText("Show customers");
 		}
 	}
 
-	public void showCustom(boolean bl) {
+	public void showCustom(boolean bl, boolean option) {
 		if (bl) {
 			Point screenSize = appModel.getScreenSize();
 			this.setLocation((int) ((screenSize.getX() - ((this.getWidth()) + (customView.getWidth()))) / 2),
 					this.getY());
-			customView.setVisible(true);
 			Point customizeView = new Point(getX() + getWidth(), getY());
 			customView.setLocation(customizeView);
+			if (option) {
+				customView.setVisible(true);
+			} else {
+				customView.setVisible(true);
+				customView.setSize(578, 262);
+//				customView.separator.setVisible(false);
+				customView.panel_2.setVisible(false);
+			}
 		} else {
 			this.setLocationRelativeTo(null);
 			customView.setVisible(false);
@@ -208,67 +239,23 @@ public class AppView extends JFrame {
 		return invoiceDao.selectById(invoice);
 	}
 
-	public void addCustomer() {
-		showCustom(true);
-		btnAddCustomer.setText("Save customer");
-	}
-
-	public void saveCustomer() {
-		if (btnAddCustomer.getText().equals("Save customer")) {
-			customer = customView.getInputCustomer();
-			customerDAO.insert(customer);
-			refreshtable();
-		} else if (btnEditCustomer.getText().equals("Save customer")) {
-			customer = new Customer();
-			customer = customView.getInputCustomer();
-			System.out.println("customer berfore" + customer.getId());
-
-			int id = selectedCustomer().getId();
-			customer.setId(id);
-
-			System.out.println("selectedid" + selectedCustomer().getId());
-			System.out.println("customer" + customer);
-
-			customerDAO.update(customer);
-			refreshtable();
-		}
-	}
-
-	public void editCustomer() {
-		if (checkSelectedRow()) {
-			customer = selectedCustomer();
-			customView.readCustomerInfomation(customer);
-			showCustom(true);
-			btnEditCustomer.setText("Save customer");
-		} else {
-			JOptionPane.showMessageDialog(this, "Select a customer to add invoices!");
-		}
-	}
-
-	public void deleteCustomer() {
-		// TODO Auto-generated method stub
-
-	}
-
 	public void addInvoice() {
-		if (checkSelectedRow()) {
-			showCustom(true);
-			customView.readCustomerInfomation(selectedCustomer());
-			customView.forbitEditng();
-			btnAddInvoice.setText("Save invoice");
-		} else {
-			JOptionPane.showMessageDialog(this, "Select a customer to add invoices!");
-		}
+//		if (checkSelectedRow()) {
+//			showCustom(true, true);
+//			customView.readCustomerInfomation(selectedCustomer());
+//			customView.forbitEditng();
+//			btnAddInvoice.setText("Save invoice");
+//		} else {
+//			JOptionPane.showMessageDialog(this, "Select a customer to add invoices!");
+//		}
 
 	}
 
 	public void saveInvoice() {
 		invoice = customView.getInputInvoice();
 		invoice.setCustomer(selectedCustomer());
-		System.out.println(invoice);
 		invoiceDao.insert(invoice);
-		System.out.println("save invoice");
-		System.out.println(customView.getInputInvoice().getDate());
+		customView.setEmptyInput();
 	}
 
 	public void editInvoice() {
@@ -279,5 +266,17 @@ public class AppView extends JFrame {
 	public void deleteInvoice() {
 		// TODO Auto-generated method stub
 
+	}
+
+	public void cancel() {
+		showCustom(false, false);
+
+		btnAddCustomer.setText("Add customer");
+		btnEditCustomer.setText("Edit customer");
+		btnDeleteCustomer.setText("Delete customer");
+
+		btnAddInvoice.setText("Add invoice");
+		btnEditInvoice.setText("Edit invoice");
+		btnDeleteInvoice.setText("Delete invoice");
 	}
 }

@@ -24,17 +24,11 @@ public class App {
 		Customer customer = new Customer();
 		customer.setId(1);
 
-		
 		List<Invoice> gettedCustomers = appModel.getInvoiceByCustomer(customer);
 
 		for (Invoice invoice : gettedCustomers) {
 			System.out.println(customer);
 		}
-		System.out.println();
-
-//		Customer customer = new Customer();
-//		customer.setId(1);
-//		Customer customer1 = customerDAO.selectById(customer);
-//		System.out.println(customer1);
+		System.out.println("----------------------------------");
 	}
 }

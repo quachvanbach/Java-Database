@@ -10,11 +10,12 @@ import viewer.AppView;
 import viewer.CustomView;
 
 public class AppController implements ActionListener {
-	AppView view;
+	AppView appView;
 	CustomView customView;
 
-	public AppController(AppView view) {
-		this.view = view;
+	public AppController(AppView appView, CustomView customView) {
+		this.appView = appView;
+		this.customView = customView;
 	}
 
 	@Override
@@ -26,25 +27,27 @@ public class AppController implements ActionListener {
 //			view.showCustom(false);
 //		} else
 		if (action.equals("Show invoices")) {
-			view.showInvoicesInformation();
+			appView.showInvoicesInformation();
 		} else if (action.equals("Show customers")) {
-			view.showCustomersInformation();
+			appView.showCustomersInformation();
+		} else if (action.equals("Cancel")) {
+			appView.cancel();
 		} else if (action.equals("Add customer")) {
-			view.addCustomer();
-		} else if (action.equals("Save customer")) {
-			view.saveCustomer();
+			customView.addCustomer();
 		} else if (action.equals("Edit customer")) {
-			view.editCustomer();
+			customView.editCustomer();
+		} else if (action.equals("Save customer")) {
+			customView.saveCustomer();
 		} else if (action.equals("Delete customer")) {
-			view.deleteCustomer();
+			customView.deleteCustomer();
 		} else if (action.equals("Add invoice")) {
-			view.addInvoice();
-		} else if (action.equals("Save invoice")) {
-			view.saveInvoice();
+			customView.addInvoice();
 		} else if (action.equals("Edit invoice")) {
-			view.editInvoice();
+			customView.editInvoice();
+		} else if (action.equals("Save invoice")) {
+			customView.saveInvoice();
 		} else if (action.equals("Delete invoice")) {
-			view.deleteInvoice();
+			customView.deleteInvoice();
 		}
 
 	}

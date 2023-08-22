@@ -1,5 +1,6 @@
 package model;
 
+import java.awt.Component;
 import java.sql.Date;
 
 import javax.persistence.Column;
