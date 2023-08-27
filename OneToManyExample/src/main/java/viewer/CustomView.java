@@ -50,11 +50,11 @@ public class CustomView extends JFrame {
 	private JTextField txtId;
 	private JTextField txtInvoiceId;
 	private JButton btnAddCustomer;
-	private JButton btnEditCustomer;
+	public JButton btnEditCustomer;
 	private JButton btnDeleteCustomer;
 	private JLabel lblId;
 	private JLabel lblInvoiceList;
-	private JComboBox<Invoice> cbInvoiceList;
+	public JComboBox<Invoice> cbInvoiceList;
 	private JLabel lblHeader2;
 	private JLabel lblDate;
 	private JLabel lblItemName;
@@ -69,7 +69,6 @@ public class CustomView extends JFrame {
 
 	public CustomView(AppView appView) {
 		this.appView = appView;
-//		initializable();
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(578, 663);
@@ -172,6 +171,12 @@ public class CustomView extends JFrame {
 		panel_1.add(lblInvoiceList);
 
 		cbInvoiceList = new JComboBox<Invoice>();
+		cbInvoiceList.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				invoice = (Invoice) cbInvoiceList.getSelectedItem();
+				readInvoiceInformation(invoice);
+			}
+		});
 		cbInvoiceList.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		cbInvoiceList.setBounds(173, 231, 347, 22);
 		panel_1.add(cbInvoiceList);
@@ -269,14 +274,17 @@ public class CustomView extends JFrame {
 		cbCustomerList.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		cbCustomerList.setBounds(173, 231, 347, 22);
 		panel_2.add(cbCustomerList);
+
+		initializable();
 	}
 
 	public void initializable() {
 		List<Customer> customerList = customerDAO.selectAll();
 		System.out.println("size: " + customerList.size());
 		for (Customer customer : customerList) {
-			System.out.println("Customer: ----------" + customerList);
+			System.out.println("Customer: ----------" + customer);
 			cbCustomerList.addItem(customer);
+			;
 		}
 
 	}
@@ -288,10 +296,8 @@ public class CustomView extends JFrame {
 			Invoice invoice = cbInvoiceList.getItemAt(i);
 			invoiceList.add(invoice);
 		}
-		customer = Customer.builder().fullName(txtCustomerName.getText().toString())
-				.phonenumber(txtPhonenumber.getText()).email(txtEmail.getText()).address(txtAddress.getText())
-				.invoices(invoiceList).build();
-
+		customer = Customer.builder().fullName(txtCustomerName.getText())
+				.phonenumber(txtPhonenumber.getText()).email(txtEmail.getText()).address(txtAddress.getText()).build();
 		if (!txtId.getText().equals("")) {
 			customer.setId(Integer.parseInt(txtId.getText()));
 		}
@@ -307,7 +313,7 @@ public class CustomView extends JFrame {
 		txtAddress.getText();
 	}
 
-	public void readCustomerInfomation(Customer customer) {
+	public void readCustomerInformation(Customer customer) {
 		txtId.setText(customer.getId() + "");
 		txtCustomerName.setText(customer.getFullName() + "");
 		txtPhonenumber.setText(customer.getPhonenumber() + "");
@@ -319,10 +325,28 @@ public class CustomView extends JFrame {
 		}
 	}
 
+	public void readInvoiceInformation(Invoice invoice) {
+		customer = appView.selectedCustomer();
+		txtInvoiceId.setText(invoice.getInvoice_id() + "");
+		txtDate.setText(invoice.getDate() + "");
+		txtItemName.setText(invoice.getItemName());
+		txtQuantity.setText(invoice.getInvoice_id() + "");
+		txtPrice.setText(invoice.getPrice() + "");
+		cbCustomerList.setSelectedItem(customer);
+	}
+
 	public Invoice getInputInvoice() {
-		invoice = Invoice.builder().date(Date.valueOf(txtDate.getText())).itemName(txtItemName.getText())
-				.quantity(Double.parseDouble(txtQuantity.getText())).price(Double.parseDouble(txtPrice.getText()))
-				.build();
+		customer = new Customer();
+		if (cbCustomerList.getSelectedIndex() == -1 && txtId != null) {
+			customer.setId(Integer.parseInt(txtId.getText()));
+		} else if (cbCustomerList.getSelectedIndex() != -1 && txtId == null) {
+			customer = (Customer) cbCustomerList.getSelectedItem();
+		} else if (cbCustomerList.getSelectedIndex() == -1 && txtId == null) {
+			JOptionPane.showMessageDialog(appView, "Select a customer to add invoices!");
+		} else if (cbCustomerList.getSelectedIndex() == -1 && txtId == null)
+			invoice = Invoice.builder().date(Date.valueOf(txtDate.getText())).itemName(txtItemName.getText())
+					.quantity(Double.parseDouble(txtQuantity.getText())).price(Double.parseDouble(txtPrice.getText()))
+					.customer(customerDAO.selectById(customer)).build();
 		if (!txtInvoiceId.getText().equals("")) {
 			invoice.setInvoice_id(Integer.parseInt(txtInvoiceId.getText()));
 		}
@@ -365,15 +389,20 @@ public class CustomView extends JFrame {
 	}
 
 	public void addCustomer() {
-		customer = getInputCustomer();
-		customerDAO.insert(customer);
-		appView.refreshtable();
+		if (!txtCustomerName.getText().equals("") && !txtPhonenumber.getText().equals("")) {
+			System.out.println("customer name" + txtCustomerName.getText());
+			customer = getInputCustomer();
+			customerDAO.insert(customer);
+			appView.refreshtable();
+		} else {
+			JOptionPane.showMessageDialog(appView, "Enter customer information");
+		}
 	}
 
 	public void editCustomer() {
 		if (appView.table.getSelectedRow() != -1) {
 			customer = customerDAO.selectById(appView.selectedCustomer());
-			readCustomerInfomation(customer);
+			readCustomerInformation(customer);
 			btnEditCustomer.setText("Save customer");
 		} else {
 			JOptionPane.showMessageDialog(appView, "Select a customer to edit!");
@@ -403,16 +432,24 @@ public class CustomView extends JFrame {
 	}
 
 	public void addInvoice() {
-		if (appView.checkSelectedRow()) {
-			if (txtId != null) {
-				readCustomerInfomation(appView.selectedCustomer());
-				invoice = getInputInvoice();
-				invoiceDAO.insert(invoice);
-				setDisableInput();
-				cbCustomerList.setSelectedItem(appView.selectedCustomer());
-			} else {
-				JOptionPane.showMessageDialog(appView, "Select a customer to add invoices!");
-			}
+		if (!txtId.getText().equals("")) {
+			readCustomerInformation(appView.selectedCustomer());
+			invoice = getInputInvoice();
+			invoiceDAO.insert(invoice);
+			setDisableInput();
+			cbCustomerList.setSelectedItem(appView.selectedCustomer());
+		} else if (appView.checkSelectedRow()) {
+			customer = getInputCustomer();
+			invoice = getInputInvoice();
+			invoice.setCustomer(customer);
+			invoiceDAO.insert(invoice);
+			cbCustomerList.setSelectedItem(appView.selectedCustomer());
+		} else if (cbCustomerList.getSelectedIndex() != -1) {
+			customer = (Customer) cbCustomerList.getSelectedItem();
+			invoice = getInputInvoice();
+			invoice.setCustomer(customer);
+			invoiceDAO.insert(invoice);
+
 		} else {
 			JOptionPane.showMessageDialog(appView, "Select a customer to add invoices!");
 		}

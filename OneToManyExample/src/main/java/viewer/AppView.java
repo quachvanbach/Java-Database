@@ -47,14 +47,6 @@ public class AppView extends JFrame {
 	private JPanel contentPane;
 	public JTable table = new JTable();
 	public JButton btnShowOption;
-	private JButton btnAddCustomer;
-	private JButton btnAddInvoice;
-	public JButton btnEditCustomer;
-	private JButton btnDeleteCustomer;
-	private JButton btnEditInvoice;
-	private JButton btnDeleteInvoice;
-	private JPanel panel_2;
-	private JPanel panel_3;
 	private JPanel panel_1;
 	private JButton btnCancel;
 
@@ -77,7 +69,10 @@ public class AppView extends JFrame {
 				if (e.getClickCount() == 2) { // Double-click
                     int row = table.rowAtPoint(e.getPoint());
                     if (row >= 0) {
-                       customView.readCustomerInfomation(selectedCustomer());
+                       customView.readCustomerInformation(selectedCustomer());
+                       invoice = (Invoice) customView.cbInvoiceList.getSelectedItem();
+                       customView.readInvoiceInformation(invoice);
+                       customView.btnEditCustomer.setText("Save customer");
                     }
                 }
 			}
@@ -94,36 +89,6 @@ public class AppView extends JFrame {
 		btnShowOption.setBounds(10, 11, 143, 23);
 		btnShowOption.addActionListener(appAction);
 
-		btnAddCustomer = new JButton("Add customer");
-		btnAddCustomer.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		btnAddCustomer.setBounds(10, 20, 143, 23);
-		btnAddCustomer.addActionListener(appAction);
-
-		btnEditCustomer = new JButton("Edit customer");
-		btnEditCustomer.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		btnEditCustomer.setBounds(10, 63, 143, 23);
-		btnEditCustomer.addActionListener(appAction);
-
-		btnDeleteCustomer = new JButton("Delete customer");
-		btnDeleteCustomer.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		btnDeleteCustomer.setBounds(10, 106, 143, 23);
-		btnDeleteCustomer.addActionListener(appAction);
-
-		btnAddInvoice = new JButton("Add invoice");
-		btnAddInvoice.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		btnAddInvoice.setBounds(10, 20, 143, 23);
-		btnAddInvoice.addActionListener(appAction);
-
-		btnEditInvoice = new JButton("Edit invoice");
-		btnEditInvoice.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		btnEditInvoice.setBounds(10, 63, 143, 23);
-		btnEditInvoice.addActionListener(appAction);
-
-		btnDeleteInvoice = new JButton("Delete invoice");
-		btnDeleteInvoice.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		btnDeleteInvoice.setBounds(10, 106, 143, 23);
-		btnDeleteInvoice.addActionListener(appAction);
-
 		panel_1 = new JPanel();
 		panel_1.setBorder(new LineBorder(new Color(68, 68, 68)));
 		panel_1.setForeground(new Color(255, 255, 255));
@@ -138,28 +103,6 @@ public class AppView extends JFrame {
 		btnCancel.setBounds(10, 52, 143, 23);
 		btnCancel.addActionListener(appAction);
 		panel_1.add(btnCancel);
-
-		panel_2 = new JPanel();
-		panel_2.setBorder(new LineBorder(new Color(68, 68, 68)));
-		panel_2.setForeground(new Color(255, 255, 255));
-		panel_2.setBackground(new Color(255, 255, 255));
-		panel_2.setBounds(742, 170, 163, 150);
-		panel_2.setLayout(null);
-		panel_2.add(btnAddCustomer);
-		panel_2.add(btnEditCustomer);
-		panel_2.add(btnDeleteCustomer);
-		contentPane.add(panel_2);
-
-		panel_3 = new JPanel();
-		panel_3.setBorder(new LineBorder(new Color(68, 68, 68)));
-		panel_3.setForeground(new Color(255, 255, 255));
-		panel_3.setBackground(new Color(255, 255, 255));
-		panel_3.setBounds(742, 330, 163, 150);
-		panel_3.setLayout(null);
-		panel_3.add(btnAddInvoice);
-		panel_3.add(btnEditInvoice);
-		panel_3.add(btnDeleteInvoice);
-		contentPane.add(panel_3);
 
 	}
 
@@ -266,17 +209,5 @@ public class AppView extends JFrame {
 	public void deleteInvoice() {
 		// TODO Auto-generated method stub
 
-	}
-
-	public void cancel() {
-		showCustom(false, false);
-
-		btnAddCustomer.setText("Add customer");
-		btnEditCustomer.setText("Edit customer");
-		btnDeleteCustomer.setText("Delete customer");
-
-		btnAddInvoice.setText("Add invoice");
-		btnEditInvoice.setText("Edit invoice");
-		btnDeleteInvoice.setText("Delete invoice");
 	}
 }
