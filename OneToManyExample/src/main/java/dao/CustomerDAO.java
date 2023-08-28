@@ -10,6 +10,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
+import model.CustomConfirmDiaglog;
 import model.Customer;
 import util.HibernateUtil;
 
@@ -47,7 +48,46 @@ public class CustomerDAO implements DAO<Customer> {
 		}
 	}
 
-	private boolean saveOrUpdate(Customer t) {
+	private boolean save(Customer t) {
+		try {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+			Transaction transaction = session.beginTransaction();
+
+			session.save(t);
+
+			transaction.commit();
+			session.close();
+			return true;
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "Error in the saveOrUpdate function of customer object " + e);
+			return false;
+		}
+	}
+
+	@Override
+	public boolean saveOrUpdate(Customer t) {
+		try {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+			Transaction transaction = session.beginTransaction();
+
+			session.persist(t);
+
+			transaction.commit();
+			return true;
+		} catch (Exception e) {
+			int result = CustomConfirmDiaglog.showCustomConfirmDialog(
+					"A customer with this ID already exists. Do you want to edit the information of this customer or create a new customer with this information?",
+					"Duplicate Customer ID", "Edit Customer Information", "Create a New Customer", 0);
+			if (result == JOptionPane.YES_OPTION) {
+				return update(t);
+			} else {
+				return save(t);
+			}
+		}
+	}
+
+	@Override
+	public boolean update(Customer t) {
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
 			Transaction transaction = session.beginTransaction();
@@ -61,16 +101,6 @@ public class CustomerDAO implements DAO<Customer> {
 			JOptionPane.showMessageDialog(null, "Error in the saveOrUpdate function of customer object " + e);
 			return false;
 		}
-	}
-
-	@Override
-	public boolean insert(Customer t) {
-		return saveOrUpdate(t);
-	}
-
-	@Override
-	public boolean update(Customer t) {
-		return saveOrUpdate(t);
 	}
 
 	@Override

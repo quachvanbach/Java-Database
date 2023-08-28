@@ -7,10 +7,14 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import com.toedter.calendar.JCalendar;
+import com.toedter.calendar.JDateChooser;
+
 import controller.AppController;
 import dao.CustomerDAO;
 import dao.InvoiceDAO;
 import model.AppModel;
+import model.CustomConfirmDiaglog;
 import model.Customer;
 import model.Invoice;
 
@@ -19,9 +23,15 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import java.awt.Font;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 import javax.swing.JSeparator;
 import javax.swing.JButton;
@@ -41,14 +51,14 @@ public class CustomView extends JFrame {
 	private JTextField txtPhonenumber;
 	private JTextField txtEmail;
 	private JTextField txtAddress;
-	private JTextField txtDate;
+//	private JTextField txtDate;
 	private JTextField txtItemName;
 	private JTextField txtQuantity;
 	private JTextField txtPrice;
 	public JPanel panel_2;
 	public Container panel_1;
 	private JTextField txtId;
-	private JTextField txtInvoiceId;
+	public JTextField txtInvoiceId;
 	private JButton btnAddCustomer;
 	public JButton btnEditCustomer;
 	private JButton btnDeleteCustomer;
@@ -66,6 +76,7 @@ public class CustomView extends JFrame {
 	private JButton btnAddInvoice;
 	private JLabel lblCustomerList;
 	private JComboBox<Customer> cbCustomerList;
+	private JDateChooser dateChooser;
 
 	public CustomView(AppView appView) {
 		this.appView = appView;
@@ -171,14 +182,18 @@ public class CustomView extends JFrame {
 		panel_1.add(lblInvoiceList);
 
 		cbInvoiceList = new JComboBox<Invoice>();
-		cbInvoiceList.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				invoice = (Invoice) cbInvoiceList.getSelectedItem();
-				readInvoiceInformation(invoice);
-			}
-		});
 		cbInvoiceList.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		cbInvoiceList.setBounds(173, 231, 347, 22);
+		cbInvoiceList.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+                   invoice = (Invoice) cbInvoiceList.getSelectedItem();
+                   showSelectedInvoice(invoice);
+                }
+			}
+		});
 		panel_1.add(cbInvoiceList);
 
 		lblHeader2 = new JLabel("Invoice information");
@@ -188,10 +203,15 @@ public class CustomView extends JFrame {
 		lblDate = new JLabel("Date:");
 		lblDate.setBounds(35, 94, 34, 17);
 		lblDate.setFont(new Font("Tahoma", Font.PLAIN, 14));
+//
+//		txtDate = new JTextField();
+//		txtDate.setBounds(173, 91, 350, 23);
+//		txtDate.setFont(new Font("Tahoma", Font.PLAIN, 14));
 
-		txtDate = new JTextField();
-		txtDate.setBounds(173, 91, 350, 23);
-		txtDate.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		dateChooser = new JDateChooser();
+		dateChooser.setBounds(173, 91, 350, 23);
+		dateChooser.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		dateChooser.setDateFormatString("dd-MM-YYYY");
 
 		lblItemName = new JLabel("Product name:");
 		lblItemName.setBounds(38, 129, 92, 17);
@@ -225,7 +245,7 @@ public class CustomView extends JFrame {
 		panel_2.setLayout(null);
 		panel_2.add(lblHeader2);
 		panel_2.add(lblDate);
-		panel_2.add(txtDate);
+//		panel_2.add(txtDate);
 		panel_2.add(lblItemName);
 		panel_2.add(txtItemName);
 		panel_2.add(lblQuantity);
@@ -234,6 +254,7 @@ public class CustomView extends JFrame {
 		panel_2.add(txtPrice);
 		panel_2.add(lblHeader2);
 		panel_2.add(lblHeader2);
+		panel_2.add(dateChooser);
 		contentPane.add(panel_2);
 
 		btnAddInvoice = new JButton("Add invoice");
@@ -278,195 +299,174 @@ public class CustomView extends JFrame {
 		initializable();
 	}
 
-	public void initializable() {
-		List<Customer> customerList = customerDAO.selectAll();
-		System.out.println("size: " + customerList.size());
-		for (Customer customer : customerList) {
-			System.out.println("Customer: ----------" + customer);
-			cbCustomerList.addItem(customer);
-			;
-		}
-
-	}
-
-	public Customer getInputCustomer() {
-		List<Invoice> invoiceList = new ArrayList<Invoice>();
-		int itemCount = cbInvoiceList.getItemCount();
-		for (int i = 0; i < itemCount; i++) {
-			Invoice invoice = cbInvoiceList.getItemAt(i);
-			invoiceList.add(invoice);
-		}
-		customer = Customer.builder().fullName(txtCustomerName.getText())
-				.phonenumber(txtPhonenumber.getText()).email(txtEmail.getText()).address(txtAddress.getText()).build();
-		if (!txtId.getText().equals("")) {
-			customer.setId(Integer.parseInt(txtId.getText()));
-		}
-
-		return customer;
-
-	}
-
-	public void clearCustomerInput() {
-		txtCustomerName.getText();
-		txtPhonenumber.getText();
-		txtEmail.getText();
-		txtAddress.getText();
-	}
-
-	public void readCustomerInformation(Customer customer) {
-		txtId.setText(customer.getId() + "");
-		txtCustomerName.setText(customer.getFullName() + "");
-		txtPhonenumber.setText(customer.getPhonenumber() + "");
-		txtEmail.setText(customer.getEmail() + "");
-		txtAddress.setText(customer.getAddress() + "");
-		List<Invoice> invoices = appModel.getInvoiceByCustomer(customer);
-		for (Invoice invoice : invoices) {
-			cbInvoiceList.addItem(invoice);
-		}
-	}
-
-	public void readInvoiceInformation(Invoice invoice) {
-		customer = appView.selectedCustomer();
-		txtInvoiceId.setText(invoice.getInvoice_id() + "");
-		txtDate.setText(invoice.getDate() + "");
-		txtItemName.setText(invoice.getItemName());
-		txtQuantity.setText(invoice.getInvoice_id() + "");
-		txtPrice.setText(invoice.getPrice() + "");
-		cbCustomerList.setSelectedItem(customer);
-	}
-
-	public Invoice getInputInvoice() {
-		customer = new Customer();
-		if (cbCustomerList.getSelectedIndex() == -1 && txtId != null) {
-			customer.setId(Integer.parseInt(txtId.getText()));
-		} else if (cbCustomerList.getSelectedIndex() != -1 && txtId == null) {
-			customer = (Customer) cbCustomerList.getSelectedItem();
-		} else if (cbCustomerList.getSelectedIndex() == -1 && txtId == null) {
-			JOptionPane.showMessageDialog(appView, "Select a customer to add invoices!");
-		} else if (cbCustomerList.getSelectedIndex() == -1 && txtId == null)
-			invoice = Invoice.builder().date(Date.valueOf(txtDate.getText())).itemName(txtItemName.getText())
-					.quantity(Double.parseDouble(txtQuantity.getText())).price(Double.parseDouble(txtPrice.getText()))
-					.customer(customerDAO.selectById(customer)).build();
-		if (!txtInvoiceId.getText().equals("")) {
-			invoice.setInvoice_id(Integer.parseInt(txtInvoiceId.getText()));
-		}
-		return invoice;
-	}
-
-	public void setDisableInput() {
-		txtCustomerName.setEditable(false);
-		txtPhonenumber.setEditable(false);
-		txtEmail.setEditable(false);
-		txtAddress.setEditable(false);
-	}
-
-	public boolean checkEmptyInput() {
-		if (txtDate != null || txtItemName != null || txtQuantity != null || txtPrice != null) {
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	public void setEmptyInput() {
-		if (txtCustomerName.isEditable()) {
-			txtId.setText(null);
-			txtCustomerName.setText("");
-			txtPhonenumber.setText("");
-			txtEmail.setText("");
-			txtAddress.setText("");
-			txtDate.setText("");
-			txtItemName.setText("");
-			txtQuantity.setText("");
-			txtPrice.setText("");
-			cbInvoiceList.removeAllItems();
-		} else {
-			txtDate.setText("");
-			txtItemName.setText("");
-			txtQuantity.setText("");
-			txtPrice.setText("");
-		}
+	private void initializable() {
+		dateChooser.setDate(Calendar.getInstance().getTime());
 	}
 
 	public void addCustomer() {
-		if (!txtCustomerName.getText().equals("") && !txtPhonenumber.getText().equals("")) {
-			System.out.println("customer name" + txtCustomerName.getText());
-			customer = getInputCustomer();
-			customerDAO.insert(customer);
+		if (!txtCustomerName.getText().equals("")) {
+			customerDAO.saveOrUpdate(getInputCustomer());
 			appView.refreshtable();
+			clearTextCustomer();
 		} else {
-			JOptionPane.showMessageDialog(appView, "Enter customer information");
+			JOptionPane.showMessageDialog(null, "Enter customer information");
 		}
 	}
 
 	public void editCustomer() {
-		if (appView.table.getSelectedRow() != -1) {
-			customer = customerDAO.selectById(appView.selectedCustomer());
-			readCustomerInformation(customer);
-			btnEditCustomer.setText("Save customer");
-		} else {
-			JOptionPane.showMessageDialog(appView, "Select a customer to edit!");
-		}
-	}
-
-	public void saveCustomer() {
-		try {
+		if (!txtId.getText().equals("")) {
 			customerDAO.update(getInputCustomer());
 			appView.refreshtable();
-			setEmptyInput();
-			btnEditCustomer.setText("Edit customer");
-		} catch (Throwable ex) {
-			JOptionPane.showMessageDialog(appView, "Select a customer to edit!");
-			btnEditCustomer.setText("Edit customer");
+			clearTextCustomer();
+		} else {
+			JOptionPane.showMessageDialog(null, "Choose a customer to edit");
 		}
 	}
 
 	public void deleteCustomer() {
-		if (appView.table.getSelectedRow() != -1) {
+		if (!txtId.getText().equals("")
+				|| (appView.checkSelectedRow() && appView.table.getColumnName(1).equals("Fullname"))) {
 			customerDAO.delete(appView.selectedCustomer());
 			appView.refreshtable();
-			setEmptyInput();
+			clearTextCustomer();
 		} else {
-			JOptionPane.showMessageDialog(appView, "Select a customer delete!");
+			JOptionPane.showMessageDialog(null, "Choose a customer to delete");
 		}
 	}
 
 	public void addInvoice() {
-		if (!txtId.getText().equals("")) {
-			readCustomerInformation(appView.selectedCustomer());
+		if (!checkEmpty(txtItemName) || !checkEmpty(txtQuantity) || !checkEmpty(txtPrice)) {
 			invoice = getInputInvoice();
-			invoiceDAO.insert(invoice);
-			setDisableInput();
-			cbCustomerList.setSelectedItem(appView.selectedCustomer());
-		} else if (appView.checkSelectedRow()) {
-			customer = getInputCustomer();
-			invoice = getInputInvoice();
-			invoice.setCustomer(customer);
-			invoiceDAO.insert(invoice);
-			cbCustomerList.setSelectedItem(appView.selectedCustomer());
-		} else if (cbCustomerList.getSelectedIndex() != -1) {
-			customer = (Customer) cbCustomerList.getSelectedItem();
-			invoice = getInputInvoice();
-			invoice.setCustomer(customer);
-			invoiceDAO.insert(invoice);
-
+			if (!checkEmpty(txtId)) {
+				customer = new Customer();
+				customer.setId(Integer.parseInt(txtId.getText()));
+				invoice.setCustomer(customerDAO.selectById(customer));
+			} else {
+				JOptionPane.showMessageDialog(null, "Choose a customer to add invoice");
+			}
+			invoiceDAO.saveOrUpdate(invoice);
+			appView.refreshtable();
+			clearTextInvoice();
 		} else {
-			JOptionPane.showMessageDialog(appView, "Select a customer to add invoices!");
+			JOptionPane.showMessageDialog(null, "Enter customer information");
 		}
 	}
 
 	public void editInvoice() {
-		// TODO Auto-generated method stub
+		if (!checkEmpty(txtInvoiceId)) {
+			Customer selectedCustomer = new Customer();
+			selectedCustomer.setId(Integer.parseInt(txtId.getText()));
+			customer = customerDAO.selectById(selectedCustomer);
+			invoice = getInputInvoice();
+			invoice.setCustomer(customer);
+			invoiceDAO.update(invoice);
 
+			JOptionPane.showMessageDialog(null, "Successfully edited!");
+			
+			appView.refreshtable();
+			clearTextCustomer();
+		} else {
+			JOptionPane.showMessageDialog(null, "Choose a customer to delete");
+		}
 	}
 
 	public void saveInvoice() {
-		// TODO Auto-generated method stub
-
+	
 	}
 
 	public void deleteInvoice() {
-		// TODO Auto-generated method stub
+		if (!checkEmpty(txtInvoiceId)
+				|| (appView.checkSelectedRow() && appView.table.getColumnName(1).equals("Purchase date"))) {
+			invoiceDAO.delete(appView.selectedInvoice());
+			appView.refreshtable();
+			clearTextInvoice();
+		} else {
+			JOptionPane.showMessageDialog(null, "Choose a customer to delete");
+		}
+	}
 
+	public Customer getInputCustomer() {
+		if (checkEmpty(txtId)) {
+			return Customer.builder().fullName(txtCustomerName.getText()).phonenumber(txtPhonenumber.getText())
+					.email(txtEmail.getText()).address(txtAddress.getText()).build();
+		} else {
+			return Customer.builder().id(Integer.parseInt(txtId.getText())).fullName(txtCustomerName.getText())
+					.phonenumber(txtPhonenumber.getText()).email(txtEmail.getText()).address(txtAddress.getText())
+					.build();
+		}
+	}
+
+	public Invoice getInputInvoice() {
+
+		if (checkEmpty(txtInvoiceId)) {
+			return Invoice.builder().date(new Date(dateChooser.getDate().getTime())).itemName(txtItemName.getText())
+					.quantity(Integer.parseInt(txtQuantity.getText())).price(Integer.parseInt(txtPrice.getText()))
+					.build();
+		} else {
+			return Invoice.builder().invoice_id(Integer.parseInt(txtInvoiceId.getText()))
+					.date(new Date(dateChooser.getDate().getTime())).itemName(txtItemName.getText())
+					.quantity(Integer.parseInt(txtQuantity.getText())).price(Integer.parseInt(txtPrice.getText()))
+					.build();
+		}
+
+	}
+
+	public void showSelectedCustomer(Customer customer) {
+		cbInvoiceList.removeAllItems();
+
+		txtId.setText(customer.getId() + "");
+		txtCustomerName.setText(customer.getFullName());
+		txtPhonenumber.setText(customer.getPhonenumber());
+		txtEmail.setText(customer.getEmail());
+		txtAddress.setText(customer.getAddress());
+
+		List<Invoice> invoiceList = appModel.getInvoiceByCustomer(customer);
+		invoiceList.stream().forEach(item -> cbInvoiceList.addItem(item)); // Java SE 1.8
+	}
+
+	public void showSelectedInvoice(Invoice invoice) {
+		cbCustomerList.removeAllItems();
+
+		txtInvoiceId.setText(invoice.getInvoice_id() + "");
+		dateChooser.setDate(invoice.getDate());
+		txtItemName.setText(invoice.getItemName());
+		txtQuantity.setText(invoice.getQuantity() + "");
+		txtPrice.setText(invoice.getPrice() + "");
+		
+		Customer customer = customerDAO.selectById(invoiceDAO.selectById(invoice).getCustomer());
+		cbCustomerList.addItem(customer);
+
+	}
+
+	public void clearTextCustomer() {
+		txtId.setText("");
+		txtCustomerName.setText("");
+		txtPhonenumber.setText("");
+		txtEmail.setText("");
+		txtAddress.setText("");
+		cbInvoiceList.removeAllItems();
+	}
+
+	public void clearTextInvoice() {
+		dateChooser.setDate(Calendar.getInstance().getTime());
+		txtItemName.setText("");
+		txtQuantity.setText("");
+		txtPrice.setText("");
+		cbCustomerList.removeAllItems();
+	}
+
+	public boolean checkEmpty(JTextField jTextField) {
+		if (jTextField.getText().equals("")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public void disableEditCustomer() {
+		txtCustomerName.setEditable(false);
+		txtPhonenumber.setEditable(false);
+		txtEmail.setEditable(false);
+		txtAddress.setEditable(false);
 	}
 }

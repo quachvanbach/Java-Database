@@ -36,8 +36,6 @@ public class AppController implements ActionListener {
 			customView.addCustomer();
 		} else if (action.equals("Edit customer")) {
 			customView.editCustomer();
-		} else if (action.equals("Save customer")) {
-			customView.saveCustomer();
 		} else if (action.equals("Delete customer")) {
 			customView.deleteCustomer();
 		} else if (action.equals("Add invoice")) {

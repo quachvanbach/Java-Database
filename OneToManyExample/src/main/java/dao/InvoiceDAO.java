@@ -8,6 +8,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
+import model.Customer;
 import model.Invoice;
 import util.HibernateUtil;
 
@@ -43,12 +44,24 @@ public class InvoiceDAO implements DAO<Invoice> {
 		}
 	}
 
-	@Override
-	public boolean insert(Invoice t) {
-		return saveOrUpdate(t);
+	private boolean save(Invoice t) {
+		try {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+			Transaction transaction = session.beginTransaction();
+
+			session.save(t);
+
+			transaction.commit();
+			session.close();
+			return true;
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "Error in the saveOrUpdate function of customer object " + e);
+			return false;
+		}
 	}
 
-	private boolean saveOrUpdate(Invoice t) {
+	@Override
+	public boolean saveOrUpdate(Invoice t) {
 		try {
 			Session session = HibernateUtil.getSessionFactory().openSession();
 			Transaction transaction = session.beginTransaction();
@@ -90,7 +103,6 @@ public class InvoiceDAO implements DAO<Invoice> {
 
 	@Override
 	public List<Invoice> getAccount(Invoice t) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

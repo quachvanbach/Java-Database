@@ -6,8 +6,8 @@ public interface DAO<T> {
 	public List<T> selectAll();
 
 	public T selectById(T t);
-
-	public boolean insert(T t);
+	
+	public boolean saveOrUpdate(T t);
 
 	public boolean update(T t);
 

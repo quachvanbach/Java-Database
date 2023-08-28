@@ -5,10 +5,13 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
+import dao.CustomerDAO;
+
 public class InvoiceTableModel extends AbstractTableModel {
 	private List<Invoice> invoices;
 	private String[] columnNames = { "ID", "Purchase date", "Item name", "Quantity", "Price", "Total amount",
 			"Customer ID" };
+	private CustomerDAO customerDao = new CustomerDAO();
 
 	public InvoiceTableModel() {
 		invoices = new ArrayList<Invoice>();
@@ -52,7 +55,7 @@ public class InvoiceTableModel extends AbstractTableModel {
 		case 5:
 			return invoice.getPrice() * invoice.getPrice();
 		case 6:
-			return "Show customer";
+			return invoice.getCustomer();
 
 		default:
 			return null;
@@ -67,8 +70,8 @@ public class InvoiceTableModel extends AbstractTableModel {
 		this.columnNames = columnNames;
 	}
 
-	@Override
-	public boolean isCellEditable(int rowIndex, int columnIndex) {
-		return columnIndex == 6; // Chỉ cột kiểu nút là có thể sửa
-	}
+//	@Override
+//	public boolean isCellEditable(int rowIndex, int columnIndex) {
+//		return columnIndex == 6; // Chỉ cột kiểu nút là có thể sửa
+//	}
 }

@@ -1,6 +1,7 @@
 package model;
 
 import java.awt.Component;
+import java.io.Serializable;
 import java.sql.Date;
 
 import javax.persistence.Column;
@@ -13,6 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,6 +27,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @Builder
+@EqualsAndHashCode
 @Table(name = "invoice")
 public class Invoice {
 	@Id
@@ -54,4 +57,6 @@ public class Invoice {
 		this.price = price;
 		this.customer = customer;
 	}
+	
+	
 }

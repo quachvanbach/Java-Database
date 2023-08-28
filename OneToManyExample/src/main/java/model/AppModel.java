@@ -42,6 +42,26 @@ public class AppModel {
 		}
 	}
 	
+	public Customer getCustomerByInvoice(Invoice invoice) {
+		try {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+			String getInvoiceHQL = "from Invoice where id = :id";
+			Query<Invoice> invoiceQuery = session.createQuery(getInvoiceHQL, Invoice.class);
+			invoiceQuery.setParameter("id", invoice.getInvoice_id());
+			Invoice invoiceResult = invoiceQuery.uniqueResult();
+			System.out.println("Invoice" + invoiceResult);
+			Customer customerResult = invoiceResult.getCustomer();
+			System.out.println("Customer" + customerResult);
+			
+			session.close();
+			return customerResult;
+		} catch (Exception e) {
+			System.out.println("Lỗi lấy ra thông tin của khách hàng");
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	public Point getScreenSize() {
 		 Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	        int screenWidth = screenSize.width;

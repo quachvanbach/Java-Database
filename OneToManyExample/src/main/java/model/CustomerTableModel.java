@@ -53,7 +53,7 @@ public class CustomerTableModel extends AbstractTableModel {
 		case 4:
 			return customer.getAddress();
 		case 5:
-			return "View invoices"; // Giá trị kiểu nút
+			return "Have " + customer.getInvoices().size() + " invoices"; // Giá trị kiểu nút
 
 		default:
 			return null;
@@ -66,8 +66,8 @@ public class CustomerTableModel extends AbstractTableModel {
 
 	}
 
-	@Override
-	public boolean isCellEditable(int rowIndex, int columnIndex) {
-		return columnIndex == 5; // Chỉ cột kiểu nút là có thể sửa
-	}
+//	@Override
+//	public boolean isCellEditable(int rowIndex, int columnIndex) {
+//		return columnIndex == 5; // Chỉ cột kiểu nút là có thể sửa
+//	}
 }
