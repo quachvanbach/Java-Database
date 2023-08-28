@@ -80,8 +80,10 @@ public class CustomerDAO implements DAO<Customer> {
 					"Duplicate Customer ID", "Edit Customer Information", "Create a New Customer", 0);
 			if (result == JOptionPane.YES_OPTION) {
 				return update(t);
-			} else {
+			} else if (result == JOptionPane.NO_OPTION){
 				return save(t);
+			} else {
+				return false;
 			}
 		}
 	}

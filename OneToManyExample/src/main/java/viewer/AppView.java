@@ -28,6 +28,7 @@ import org.hibernate.cache.spi.support.AbstractReadWriteAccess.Item;
 import java.awt.Button;
 import java.awt.Component;
 import javax.swing.JToggleButton;
+import javax.swing.ListSelectionModel;
 import javax.swing.JButton;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -83,6 +84,7 @@ public class AppView extends JFrame {
 		});
 		table.setBounds(0, 0, 1, 1);
 		table.setModel(customerTableModel);
+		table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setBounds(10, 11, 722, 609);
@@ -112,18 +114,11 @@ public class AppView extends JFrame {
 	}
 
 	public void refreshtable() {
-//		List<Customer> customers = customerDAO.selectAll();
-//		customerTableModel.setCustomers(customers);
-//
-//		List<Invoice> invoices = invoiceDao.selectAll();
-//		invoiceTableModel.setInvoices(invoices);
-
 		if (btnShowOption.getText().equals("Show invoices")) {
 			showCustomersInformation();
 		} else {
 			showInvoicesInformation();
 		}
-
 		showCustom(true, true);
 	}
 
@@ -136,7 +131,7 @@ public class AppView extends JFrame {
 	}
 
 	public void showInvoicesInformation() {
-		if (checkSelectedRow()) {
+		if (checkSelectedRow() && table.getColumnName(1).equals("Fullname")) {
 			customer = new Customer();
 			int id = Integer.parseInt(table.getValueAt(table.getSelectedRow(), 0) + "");
 			customer.setId(id);
@@ -165,7 +160,6 @@ public class AppView extends JFrame {
 			} else {
 				customView.setVisible(true);
 				customView.setSize(578, 262);
-//				customView.separator.setVisible(false);
 				customView.panel_2.setVisible(false);
 			}
 		} else {
@@ -195,5 +189,11 @@ public class AppView extends JFrame {
 		} else {
 			return true;
 		}
+	}
+
+	public void cancel() {
+		refreshtable();
+		customView.clearTextCustomer();
+		customView.clearTextInvoice();
 	}
 }

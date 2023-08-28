@@ -184,16 +184,16 @@ public class CustomView extends JFrame {
 		cbInvoiceList = new JComboBox<Invoice>();
 		cbInvoiceList.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		cbInvoiceList.setBounds(173, 231, 347, 22);
-		cbInvoiceList.addItemListener(new ItemListener() {
-
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-                   invoice = (Invoice) cbInvoiceList.getSelectedItem();
-                   showSelectedInvoice(invoice);
-                }
-			}
-		});
+//		cbInvoiceList.addItemListener(new ItemListener() {
+//
+//			@Override
+//			public void itemStateChanged(ItemEvent e) {
+//				if (e.getStateChange() == ItemEvent.SELECTED) {
+//                   invoice = (Invoice) cbInvoiceList.getSelectedItem();
+//                   showSelectedInvoice(invoice);
+//                }
+//			}
+//		});
 		panel_1.add(cbInvoiceList);
 
 		lblHeader2 = new JLabel("Invoice information");
@@ -314,24 +314,38 @@ public class CustomView extends JFrame {
 	}
 
 	public void editCustomer() {
-		if (!txtId.getText().equals("")) {
-			customerDAO.update(getInputCustomer());
-			appView.refreshtable();
-			clearTextCustomer();
+		int result = CustomConfirmDiaglog.showCustomConfirmDialog("Are you sure you want to correct this information?",
+				"Edit information", "Yes", "No", 0);
+		if (result == JOptionPane.YES_OPTION) {
+			if (!txtId.getText().equals("")) {
+				customerDAO.update(getInputCustomer());
+				appView.refreshtable();
+				clearTextCustomer();
+				JOptionPane.showMessageDialog(null, "Successfully edited!");
+			} else {
+				JOptionPane.showMessageDialog(null, "Choose a customer to edit");
+			}
 		} else {
-			JOptionPane.showMessageDialog(null, "Choose a customer to edit");
+			JOptionPane.showMessageDialog(null, "The information has not been saved.");
+
 		}
 	}
 
 	public void deleteCustomer() {
-		if (!txtId.getText().equals("")
-				|| (appView.checkSelectedRow() && appView.table.getColumnName(1).equals("Fullname"))) {
-			customerDAO.delete(appView.selectedCustomer());
-			appView.refreshtable();
-			clearTextCustomer();
-		} else {
-			JOptionPane.showMessageDialog(null, "Choose a customer to delete");
+		int result = CustomConfirmDiaglog.showCustomConfirmDialog("Do you want to delete this information??",
+				"Delete information", "Yes", "No", 0);
+
+		if (result == JOptionPane.YES_OPTION) {
+			if (!txtId.getText().equals("")
+					|| (appView.checkSelectedRow() && appView.table.getColumnName(1).equals("Fullname"))) {
+				customerDAO.delete(appView.selectedCustomer());
+				appView.refreshtable();
+				clearTextCustomer();
+			} else {
+				JOptionPane.showMessageDialog(null, "Choose a customer to delete");
+			}
 		}
+
 	}
 
 	public void addInvoice() {
@@ -341,6 +355,7 @@ public class CustomView extends JFrame {
 				customer = new Customer();
 				customer.setId(Integer.parseInt(txtId.getText()));
 				invoice.setCustomer(customerDAO.selectById(customer));
+				clearTextInvoice();
 			} else {
 				JOptionPane.showMessageDialog(null, "Choose a customer to add invoice");
 			}
@@ -348,40 +363,48 @@ public class CustomView extends JFrame {
 			appView.refreshtable();
 			clearTextInvoice();
 		} else {
-			JOptionPane.showMessageDialog(null, "Enter customer information");
+			JOptionPane.showMessageDialog(null, "Enter invoice information");
 		}
 	}
 
 	public void editInvoice() {
-		if (!checkEmpty(txtInvoiceId)) {
-			Customer selectedCustomer = new Customer();
-			selectedCustomer.setId(Integer.parseInt(txtId.getText()));
-			customer = customerDAO.selectById(selectedCustomer);
-			invoice = getInputInvoice();
-			invoice.setCustomer(customer);
-			invoiceDAO.update(invoice);
+		int result = CustomConfirmDiaglog.showCustomConfirmDialog("Do you want to delete this information??",
+				"Delete information", "Yes", "No", 0);
 
-			JOptionPane.showMessageDialog(null, "Successfully edited!");
-			
-			appView.refreshtable();
-			clearTextCustomer();
+		if (result == JOptionPane.YES_OPTION) {
+			if (!checkEmpty(txtInvoiceId)) {
+				Customer selectedCustomer = new Customer();
+				selectedCustomer.setId(Integer.parseInt(txtId.getText()));
+				customer = customerDAO.selectById(selectedCustomer);
+				invoice = getInputInvoice();
+				invoice.setCustomer(customer);
+				invoiceDAO.update(invoice);
+
+				JOptionPane.showMessageDialog(null, "Successfully edited!");
+
+				appView.refreshtable();
+				clearTextCustomer();
+			} else {
+				JOptionPane.showMessageDialog(null, "Choose a invoice to edit");
+			}
 		} else {
-			JOptionPane.showMessageDialog(null, "Choose a customer to delete");
+			JOptionPane.showMessageDialog(null, "The information has not been saved.");
 		}
 	}
 
-	public void saveInvoice() {
-	
-	}
-
 	public void deleteInvoice() {
-		if (!checkEmpty(txtInvoiceId)
-				|| (appView.checkSelectedRow() && appView.table.getColumnName(1).equals("Purchase date"))) {
-			invoiceDAO.delete(appView.selectedInvoice());
-			appView.refreshtable();
-			clearTextInvoice();
-		} else {
-			JOptionPane.showMessageDialog(null, "Choose a customer to delete");
+		int result = CustomConfirmDiaglog.showCustomConfirmDialog("Do you want to delete this information??",
+				"Delete information", "Yes", "No", 0);
+
+		if (result == JOptionPane.YES_OPTION) {
+			if (!checkEmpty(txtInvoiceId)
+					|| (appView.checkSelectedRow() && appView.table.getColumnName(1).equals("Purchase date"))) {
+				invoiceDAO.delete(appView.selectedInvoice());
+				appView.refreshtable();
+				clearTextInvoice();
+			} else {
+				JOptionPane.showMessageDialog(null, "Choose a invoice to delete");
+			}
 		}
 	}
 
@@ -432,7 +455,7 @@ public class CustomView extends JFrame {
 		txtItemName.setText(invoice.getItemName());
 		txtQuantity.setText(invoice.getQuantity() + "");
 		txtPrice.setText(invoice.getPrice() + "");
-		
+
 		Customer customer = customerDAO.selectById(invoiceDAO.selectById(invoice).getCustomer());
 		cbCustomerList.addItem(customer);
 
